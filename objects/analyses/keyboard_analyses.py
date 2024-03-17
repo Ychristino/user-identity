@@ -37,6 +37,7 @@ class KeyboardAnalyses:
     """
     Classe responsável por ler os dados de teclado e realizar a extração e cálculos dos dados necessários.
     """
+
     def __init__(self, keyboard_press_data: pd.DataFrame = None, keyboard_release_data: pd.DataFrame = None):
         self.keyboard_press_data = keyboard_press_data
         self.keyboard_release_data = keyboard_release_data
@@ -47,12 +48,14 @@ class KeyboardAnalyses:
 
     def extract_keyboard_data(self,
                               keyboard_pressed_data: pd.DataFrame = None,
-                              keyboard_released_data: pd.DataFrame = None) -> list[int | float | Any] | None:
+                              keyboard_released_data: pd.DataFrame = None,
+                              make_mean: bool = True) -> list[int | float | Any] | None:
         """
         Realiza a extração dos dados e métricas do teclado, como velocidade de digitação, número de teclas
         pressionadas, etc.
         :param keyboard_pressed_data: Dataframe de dados de evento 'press' do teclado
         :param keyboard_released_data: Dataframe de dados de evento 'release' do teclado
+        :param make_mean: Se já existir um valor anterior gravado, calcula a média entre o atual e o anterior
         :return: Lista com todas as métricas extraídas da leitura dos dados
         """
         if keyboard_pressed_data is not None:
@@ -70,30 +73,40 @@ class KeyboardAnalyses:
 
         total_keys_pressed = len(df_keys_pressed)
         self.total_keys_pressed = np.nanmean([self.total_keys_pressed,
-                                              total_keys_pressed]) if self.total_keys_pressed is not None else total_keys_pressed
+                                              total_keys_pressed]) if (self.total_keys_pressed is not None and make_mean) else total_keys_pressed
 
         # typing_ratio
         total_typing_time_seconds = df_keys_released['time'].max() - df_keys_pressed['time'].min()
         typing_ratio = total_keys_pressed / total_typing_time_seconds
         self.typing_ratio = np.nanmean(
-            [self.typing_ratio, typing_ratio]) if self.typing_ratio is not None else typing_ratio
+            [self.typing_ratio, typing_ratio]) if (self.typing_ratio is not None and make_mean) else typing_ratio
 
         # average_time_pressed
         merged = pd.merge(df_keys_pressed, df_keys_released, on='key', suffixes=('_press', '_release'))
         merged['time_pressed'] = merged['time_release'] - merged['time_press']
         average_time_pressed = merged['time_pressed'].mean()
         self.average_time_pressed = np.nanmean([self.average_time_pressed,
-                                                average_time_pressed]) if self.average_time_pressed is not None else average_time_pressed
+                                                average_time_pressed]) if (self.average_time_pressed is not None and make_mean) else average_time_pressed
 
         # average_interval_between_keys
         df_keys_pressed['time_next_key'] = df_keys_pressed['time'].shift(-1)
         df_keys_pressed['interval_to_next_key'] = df_keys_pressed['time_next_key'] - df_keys_pressed['time']
         average_interval_between_keys = df_keys_pressed['interval_to_next_key'].mean()
         self.average_interval_between_keys = np.nanmean([self.average_interval_between_keys,
-                                                         average_interval_between_keys]) if self.average_interval_between_keys is not None else average_interval_between_keys
+                                                         average_interval_between_keys]) if (self.average_interval_between_keys is not None and make_mean) else average_interval_between_keys
 
         return [self.total_keys_pressed, self.typing_ratio, self.average_time_pressed,
                 self.average_interval_between_keys]
+
+    def generate_dataframe(self):
+        data = {
+                'total_keys_pressend': self.total_keys_pressed,
+                'typing_ratio': self.typing_ratio,
+                'average_time_pressed': self.average_time_pressed,
+                'average_interval_beween_keys': self.average_interval_between_keys
+            }
+
+        return pd.DataFrame(data, index=[0])
 
 
 if __name__ == '__main__':

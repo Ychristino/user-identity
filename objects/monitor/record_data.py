@@ -16,7 +16,8 @@ class RecordData:
     agrupadas em classes independentes de monitoramente, como mouse_monitor ou keyboard_monitor
     """
 
-    def __init__(self):
+    def __init__(self, username: str):
+        self.username = username
         self.mouse_monitor = MouseMonitor()
         self.keyboard_monitor = KeyboardMonitor()
         self.mouse_data = []
@@ -76,7 +77,8 @@ class RecordData:
         """
         caller_method = inspect.stack()[1][3]
 
-        data_path = './files/user/'
+        data_path = f'./files/{self.username}/'
+
         if not os.path.exists(data_path):
             os.makedirs(data_path)
 
