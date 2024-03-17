@@ -53,7 +53,7 @@ class Classifier(ABC):
             self.mouse_analyses.extract_movement_metrics(make_mean=False)
             self.mouse_analyses.extract_distance_metrics(make_mean=False)
 
-            if len(list_mouse_movement_data) > index:
+            if index < len(list_mouse_click_data):
                 self.mouse_analyses.mouse_click_data = list_mouse_click_data[index]
                 self.mouse_analyses.extract_clicks_metrics(make_mean=False)
 
