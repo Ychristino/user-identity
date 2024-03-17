@@ -1,1 +1,27 @@
 /files/
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Diretórios de ambiente virtual
+venv/
+*.pyc
+
+# Arquivos de log
+*.log
+
+# Arquivos temporários
+*.tmp
+
+# Arquivos de banco de dados
+*.db
+
+# Diretórios de build e dist
+build/
+dist/
+
+# Arquivos do PyCharm
+.idea/
+
+# Arquivos do Jupyter Notebook
+.ipynb_checkpoints/
