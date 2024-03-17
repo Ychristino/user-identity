@@ -26,12 +26,17 @@ class TreeClassifier(Classifier):
     def execute(self, base_directory: str = './files'):
 
         labels_executed = []
+        merge_control = 0
         for root, subdirectory, files in os.walk(base_directory):
+            merge_control += 1
             for folder in subdirectory:
+                merge_control += 1
                 self.load_mouse_analyses(mouse_file_path=os.path.join(root, folder, 'mouse_data.json'),
-                                         identifier_label=folder)
+                                         identifier_label=folder,
+                                         merge_control=merge_control)
                 self.load_keyboard_analyses(keyboard_file_path=os.path.join(root, folder, 'keyboard_data.json'),
-                                            identifier_label=folder)
+                                            identifier_label=folder,
+                                            merge_control=merge_control)
                 labels_executed.append(labels_executed)
 
         x_train, x_test, y_train, y_test = self.prepare_data(validation_column_label='expected')
@@ -47,7 +52,7 @@ class TreeClassifier(Classifier):
                                                      current_predictions=predictions)
 
         plt.figure(figsize=(10, 10))  # Ajuste o tamanho da figura conforme necessário
-        plot_tree(self.classifier, filled=True, feature_names=self.df_mouse_stats.drop('expected', axis=1).columns,
+        plot_tree(self.classifier, filled=True, feature_names=x_test.columns,
                   class_names=True)
         plt.show()
 
