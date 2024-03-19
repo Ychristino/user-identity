@@ -1,0 +1,12 @@
+<!-- record_data.html -->
+{% extends "base.html" %}
+{% block title %}Record Data{% endblock %}
+{% block content %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<div id="scatterPlot" style="width: 50%; height: 30%;"></div>
+<div id="densityPlot" style="width: 50%; height: 30%;"></div>
+
+<script src="{{ url_for('static', filename='scripts/view/generateScatterplot.js') }}" type="module"></script>
+<script src="{{ url_for('static', filename='scripts/view/generateHistograma.js') }}" type="module"></script>
+{% endblock %}

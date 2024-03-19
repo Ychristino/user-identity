@@ -5,6 +5,7 @@ import json
 import inspect
 from typing import Tuple, List, Any
 
+from common.constants import MOUSE_FILE, KEYBOARD_FILE
 from objects.monitor.keyboard_monitor import KeyboardMonitor
 from objects.monitor.mouse_monitor import MouseMonitor
 
@@ -84,7 +85,7 @@ class RecordData:
 
         if bool(self.mouse_data):
             if caller_method == 'stop_mouse_record' or caller_method == 'stop_all':
-                file_path = f'{data_path}mouse_data.json'
+                file_path = f'{data_path}{MOUSE_FILE}'
                 if os.path.exists(file_path):
                     with open(file_path, 'r') as f:
                         data = json.load(f)
@@ -96,7 +97,7 @@ class RecordData:
 
         if bool(self.keyboard_data):
             if caller_method == 'stop_keyboard_record' or caller_method == 'stop_all':
-                file_path = f'{data_path}keyboard_data.json'
+                file_path = f'{data_path}{KEYBOARD_FILE}'
                 if os.path.exists(file_path):
                     with open(file_path, 'r') as f:
                         data = json.load(f)

@@ -8,6 +8,7 @@ from pandas import DataFrame, Series
 from pynput.mouse import Button
 
 from common.click_status import ClickStatus
+from common.constants import MOUSE_FILE
 
 
 def read_file(mouse_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
@@ -18,12 +19,12 @@ def read_file(mouse_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
     :return: Lista de Dataframes de eventos 'move' do mouse, Lista de Dataframes de eventos 'click' do mouse
     """
     with open(mouse_file_path, 'r') as f:
-        keyboard_data_json = json.load(f)
+        mouse_data_json = json.load(f)
 
     list_df_mouse_movement_data = []
     list_df_mouse_click_data = []
 
-    for item in keyboard_data_json:
+    for item in mouse_data_json:
 
         if bool(item):
             df_mouse_movement_data = pd.DataFrame(item['move'])
@@ -386,7 +387,7 @@ class MouseAnalyses:
 
 if __name__ == '__main__':
     analyses = MouseAnalyses()
-    list_mouse_movement_data, list_mouse_click_data = read_file('../../files/user/mouse_data.json')
+    list_mouse_movement_data, list_mouse_click_data = read_file(f'../../files/user/{MOUSE_FILE}')
 
     for move_data in list_mouse_movement_data:
         analyses.mouse_movement_data = move_data

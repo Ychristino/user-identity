@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Página Inicial{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header com título e breve descrição -->
+    <header class="text-center py-5">
+        <h1>Welcome to the identifier</h1>
+        <p class="lead">You are safe here, unless you are not who you're saying you are...</p>
+    </header>
+
+    <!-- Seção de destaque com imagem -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2 class="display-4">Thrend</h2>
+                    <p class="lead">Monitoring methods that can certify the current user of the system. If you want to always check that you're the only one using your applications, call our verification services to it.</p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{{ url_for('static', filename='assets/') }}" class="img-fluid" alt="Highlighted Image">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção de recursos -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <h3>Record Data</h3>
+                    <p>That's the place where you can create a new Data-set and create profiles for every user. Click on the button bellow and start recording a new data.</p>
+                    <a href="/record" class="btn btn-primary d-block w-100">Start Prevention</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

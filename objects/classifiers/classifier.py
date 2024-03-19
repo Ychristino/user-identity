@@ -6,6 +6,8 @@ from sklearn.metrics import classification_report, precision_recall_fscore_suppo
 from sklearn.model_selection import train_test_split
 
 from abc import ABC, abstractmethod
+
+from common.constants import MOUSE_FILE, KEYBOARD_FILE
 from objects.analyses.mouse_analyses import MouseAnalyses
 from objects.analyses.keyboard_analyses import KeyboardAnalyses
 from objects.analyses.keyboard_analyses import read_file as read_keyboard_file
@@ -132,10 +134,10 @@ class Classifier(ABC):
             merge_control += 1
             for folder in subdirectory:
                 merge_control += 1
-                self.load_mouse_analyses(mouse_file_path=os.path.join(root, folder, 'mouse_data.json'),
+                self.load_mouse_analyses(mouse_file_path=os.path.join(root, folder, MOUSE_FILE),
                                          identifier_label=folder,
                                          merge_control=merge_control)
-                self.load_keyboard_analyses(keyboard_file_path=os.path.join(root, folder, 'keyboard_data.json'),
+                self.load_keyboard_analyses(keyboard_file_path=os.path.join(root, folder, KEYBOARD_FILE),
                                             identifier_label=folder,
                                             merge_control=merge_control)
                 labels_executed.append(labels_executed)
