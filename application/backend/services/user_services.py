@@ -4,7 +4,7 @@ import os
 
 class UserService:
     def __init__(self):
-        self.base_path = "..\\..\\files"
+        self.base_path = ".\\files"
 
     def get_user_data(self, username: str = None):
         user_data = {}

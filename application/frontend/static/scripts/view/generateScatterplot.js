@@ -1,14 +1,4 @@
-import { ApiRequest } from '../apiRequest.js';
-import { BASE_URL, API_MOUSE_MOVE } from '../consts/apiConstants.js';
-
-const API = new ApiRequest(BASE_URL);
-
-async function plotScatterPlot() {
-    // Fazer a solicitação à API
-    const response = await API.get(API_MOUSE_MOVE + '/suspect');
-
-    // Extrair dados da resposta da API
-    const data = response; // Supondo que a resposta da API tenha um campo 'data' que contém os dados necessários
+async function plotScatterPlot(data, plot_destination) {
 
     // Extrair coordenadas x e y dos dados
     const xCoords = data.map(item => item.x_position);
@@ -16,12 +6,13 @@ async function plotScatterPlot() {
 
     // Criar o layout do gráfico de dispersão
     const layout = {
-        title: 'Gráfico de Dispersão',
+        title: 'Dispersion Graph',
         xaxis: {
-            title: 'Coordenada X'
+            title: 'Coordinate X'
         },
         yaxis: {
-            title: 'Coordenada Y'
+            title: 'Coordinate Y',
+            autorange: 'reversed'
         }
     };
 
@@ -34,8 +25,7 @@ async function plotScatterPlot() {
     }];
 
     // Plotar o gráfico de dispersão no elemento HTML com o id 'scatterPlot'
-    Plotly.newPlot('scatterPlot', scatterPlotData, layout);
+    Plotly.newPlot(plot_destination, scatterPlotData, layout);
 }
 
-// Chamar a função para plotar o gráfico de dispersão quando o documento estiver pronto
-document.addEventListener('DOMContentLoaded', plotScatterPlot);
+export { plotScatterPlot };

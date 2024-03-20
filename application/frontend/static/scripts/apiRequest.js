@@ -25,6 +25,7 @@ class ApiRequest {
 
     async get(endpoint) {
         try {
+            console.log(`${this.baseUrl}/${endpoint}`)
             const response = await fetch(`${this.baseUrl}/${endpoint}`, {
                 method: 'GET',
                 headers: {

@@ -1,12 +1,34 @@
-<!-- record_data.html -->
 {% extends "base.html" %}
 {% block title %}Record Data{% endblock %}
 {% block content %}
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
-<div id="scatterPlot" style="width: 50%; height: 30%;"></div>
-<div id="densityPlot" style="width: 50%; height: 30%;"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <form>
+          <div class="form-group mt-3">
+            <label for="graphType">Graph Type</label>
+            <select class="form-control" id="graphType">
+              <option value="heatmap">Heatmap</option>
+              <option value="scatterplot">Scatterplot</option>
+              <option value="statistics">Statistics</option>
+              <option value="comparative">Comparative</option>
+            </select>
+          </div>
+          <div class="form-group mt-3">
+            <label for="user">Select User</label>
+            <select class="form-control" id="user">
+              <!-- Options will be dynamically added here -->
+            </select>
+          </div>
+          <button type="button" id="generateGraph" class="btn btn-primary mt-3">Generate</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
-<script src="{{ url_for('static', filename='scripts/view/generateScatterplot.js') }}" type="module"></script>
-<script src="{{ url_for('static', filename='scripts/view/generateHistograma.js') }}" type="module"></script>
+  <div id="graphPlot"></div>
+
+  <script src="{{ url_for('static', filename='scripts/view/pageIteractions.js') }}" type="module"></script>
 {% endblock %}
