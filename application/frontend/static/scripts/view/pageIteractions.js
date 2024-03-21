@@ -1,4 +1,4 @@
-import { USER_LIST, MOUSE_MOVE } from './apiView.js';
+import { USER_LIST, MOUSE_MOVE, FULL_DATA } from './apiView.js';
 import { plotScatterPlot } from './generateScatterplot.js';
 import { plot2DDensityPlot } from './generate2DDensity.js';
 
@@ -20,12 +20,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.getElementById('graphType').addEventListener('change', (event)=>{
     const SELECT_USER = document.getElementById('user');
+    const USER_DIV = document.getElementById('userArea');
 
     if (event.target.value.toLowerCase() === 'comparative'){
         SELECT_USER.disabled = true;
+        USER_DIV.style.display = 'none';
     }
     else{
         SELECT_USER.disabled = false;
+        USER_DIV.style.display = 'block';
     }
 });
 
@@ -55,18 +58,19 @@ async function plot_graph(graph_type, username) {
     try {
         switch(graph_type.toLowerCase()) {
             case 'heatmap':
-                const mouse_data = await MOUSE_MOVE(username);
-                plot2DDensityPlot(mouse_data, 'graphPlot');
+                const HEATMAP_DATA = await MOUSE_MOVE(username);
+                plot2DDensityPlot(HEATMAP_DATA, 'graphPlot');
                 break;
             case 'scatterplot':
-                const scatter_data = await MOUSE_MOVE(username);
-                plotScatterPlot(scatter_data, 'graphPlot');
+                const SCATTER_DATA = await MOUSE_MOVE(username);
+                plotScatterPlot(SCATTER_DATA, 'graphPlot');
                 break;
             case 'statistics':
                 // Implementação dos gráficos de estatísticas
                 break;
             case 'comparative':
-                // Implementação dos gráficos comparativos
+                const GROUPBAR_DATA = await FULL_DATA();
+                console.log(GROUPBAR_DATA)
                 break;
             default:
                 alert("Você escolheu uma opção inválida. Por favor, escolha outra opção.");
