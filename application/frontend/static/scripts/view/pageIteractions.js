@@ -18,50 +18,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-document.getElementById('generateGraph').addEventListener('click', ()=>{
-    const PLOT_SELECTED = document.getElementById('graphType').value;
-    const SELECTED_USER = document.getElementById('user').value;
-    const GRAPH_PLOT = document.getElementById('graphPlot');
-    const LOADING_SPINNER = document.getElementById("loading").style
-
-    GRAPH_PLOT.innerHTML = '';
-    LOADING_SPINNER.display = "block";
-
-    switch(PLOT_SELECTED.toLowerCase()){
-        case 'heatmap':
-            MOUSE_MOVE(SELECTED_USER)
-            .then(mouse_data=>{
-                plot2DDensityPlot(mouse_data, 'graphPlot');
-            })
-            .catch(error => {
-                console.error('Erro ao obter dados do usuários:', error);
-            })
-            .finally(()=>{
-                LOADING_SPINNER.display = "none";
-            });
-            break;
-        case 'scatterplot':
-            MOUSE_MOVE(SELECTED_USER)
-            .then(mouse_data=>{
-                plotScatterPlot(mouse_data, 'graphPlot');
-            })
-            .catch(error => {
-                console.error('Erro ao obter dados do usuários:', error);
-            })
-            .finally(()=>{
-                LOADING_SPINNER.display = "none";
-            });
-            break;
-        case 'statistics':
-            break;
-        case 'comparative':
-            break;
-        default:
-            alert("You know that's an invalid option... don't do that...");
-    }
-
-});
-
 document.getElementById('graphType').addEventListener('change', (event)=>{
     const SELECT_USER = document.getElementById('user');
 
@@ -72,3 +28,51 @@ document.getElementById('graphType').addEventListener('change', (event)=>{
         SELECT_USER.disabled = false;
     }
 });
+
+document.getElementById('generateGraph').addEventListener('click', async () => {
+    const PLOT_SELECTED = document.getElementById('graphType').value;
+    const SELECTED_USER = document.getElementById('user').value;
+    const GRAPH_PLOT = document.getElementById('graphPlot');
+    const LOADING_SPINNER = document.getElementById("loading").style;
+    const BTM_GENERATE = document.getElementById('generateGraph').style;
+
+    GRAPH_PLOT.innerHTML = '';
+    LOADING_SPINNER.display = "block"; // Exibir o spinner
+    BTM_GENERATE.disabled = true;
+
+    try {
+        await plot_graph(PLOT_SELECTED, SELECTED_USER);
+    } catch (error) {
+        console.error('Erro ao plotar o gráfico:', error);
+        // Tratamento de erro adicional, se necessário
+    } finally {
+        LOADING_SPINNER.display = "none"; // Ocultar o spinner após o término da função plot_graph
+        BTM_GENERATE.disabled = false;
+    }
+});
+
+async function plot_graph(graph_type, username) {
+    try {
+        switch(graph_type.toLowerCase()) {
+            case 'heatmap':
+                const mouse_data = await MOUSE_MOVE(username);
+                plot2DDensityPlot(mouse_data, 'graphPlot');
+                break;
+            case 'scatterplot':
+                const scatter_data = await MOUSE_MOVE(username);
+                plotScatterPlot(scatter_data, 'graphPlot');
+                break;
+            case 'statistics':
+                // Implementação dos gráficos de estatísticas
+                break;
+            case 'comparative':
+                // Implementação dos gráficos comparativos
+                break;
+            default:
+                alert("Você escolheu uma opção inválida. Por favor, escolha outra opção.");
+        }
+    } catch (error) {
+        console.error('Erro ao obter dados do usuário:', error);
+        throw error;
+    }
+}

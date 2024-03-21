@@ -5,7 +5,6 @@ const API = new ApiRequest(BASE_URL);
 
 const MOUSE_MOVE = async (username) => {
     try {
-        console.log(API.get_user_endpoint(API_MOUSE_MOVE, username))
         const response = await API.get(API.get_user_endpoint(API_MOUSE_MOVE, username));
         return response.data;
     } catch (error) {

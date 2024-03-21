@@ -1,4 +1,4 @@
-function plotScatterPlot(data, plot_destination) {
+async function plotScatterPlot(data, plot_destination) {
 
     // Extrair coordenadas x e y dos dados
     const xCoords = data.map(item => item.x_position);

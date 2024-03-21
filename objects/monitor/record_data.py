@@ -85,7 +85,7 @@ class RecordData:
 
         if bool(self.mouse_data):
             if caller_method == 'stop_mouse_record' or caller_method == 'stop_all':
-                file_path = f'{data_path}{MOUSE_FILE}'
+                file_path = os.path.join(data_path, MOUSE_FILE)
                 if os.path.exists(file_path):
                     with open(file_path, 'r') as f:
                         data = json.load(f)
@@ -97,7 +97,7 @@ class RecordData:
 
         if bool(self.keyboard_data):
             if caller_method == 'stop_keyboard_record' or caller_method == 'stop_all':
-                file_path = f'{data_path}{KEYBOARD_FILE}'
+                file_path = os.path.join(data_path,KEYBOARD_FILE)
                 if os.path.exists(file_path):
                     with open(file_path, 'r') as f:
                         data = json.load(f)
@@ -109,7 +109,7 @@ class RecordData:
 
 
 if __name__ == '__main__':
-    record_data = RecordData()
+    record_data = RecordData('user')
     recording_thread = threading.Thread(target=record_data.record_all)
     recording_thread.start()
     time.sleep(10)

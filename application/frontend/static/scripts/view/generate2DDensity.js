@@ -1,4 +1,4 @@
-function plot2DDensityPlot(data, plot_destination) {
+async function plot2DDensityPlot(data, plot_destination) {
 
     // Extrair coordenadas X e Y dos dados
     const xCoords = data.map(item => item.x_position);
