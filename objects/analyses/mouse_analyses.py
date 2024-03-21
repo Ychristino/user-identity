@@ -111,82 +111,94 @@ class MouseAnalyses:
         else:
             df_velocity = self.mouse_movement_data[['x_position', 'y_position', 'time']]
 
-        max_float = 1e10  # Choose an appropriate large finite value
-        min_float = -1e10  # Choose an appropriate small finite value
-
-        # Calcular as diferenças de posição e tempo
-        df_velocity = df_velocity[['x_position', 'y_position', 'time']]
-        df_velocity = df_velocity.sort_values(by='time')
-
-        df_velocity['delta_x'] = df_velocity['x_position'].diff()
-        df_velocity['delta_y'] = df_velocity['y_position'].diff()
-        df_velocity['delta_t'] = df_velocity['time'].diff()
+        # Calculando as variações de posição em relação ao tempo para cada direção
+        df_velocity['x_variation'] = df_velocity['x_position'].diff()
+        df_velocity['y_variation'] = df_velocity['y_position'].diff()
+        df_velocity['time_variation'] = df_velocity['time'].diff()
         df_velocity = df_velocity.fillna(0)
 
-        # Calcular as velocidades
-        df_velocity['velocidade_x'] = df_velocity['delta_x'] / df_velocity['delta_t']
-        df_velocity['velocidade_y'] = df_velocity['delta_y'] / df_velocity['delta_t']
-        df_velocity = df_velocity.fillna(0)
-        df_velocity = df_velocity.replace([np.inf, -np.inf], [max_float, min_float])
-        df_velocity['velocidade'] = np.sqrt(df_velocity['velocidade_x'] ** 2 + df_velocity['velocidade_y'] ** 2)
-
-        # Calcular as velocidades médias, máximas e mínimas
-        up_average_speed = df_velocity[df_velocity['velocidade_y'] > 0]['velocidade_y'].mean()
+        # Calculando as velocidades médias em cada direção
+        up_average_speed = df_velocity[df_velocity['y_variation'] < 0]['y_variation'].sum() / df_velocity[
+            'time_variation'].sum()
         self.up_average_speed = np.nanmean([self.up_average_speed, up_average_speed]) if (
-                    self.up_average_speed is not None and make_mean) else up_average_speed if not np.isnan(up_average_speed) else 0
+                self.up_average_speed is not None and make_mean) else up_average_speed if not np.isnan(
+            up_average_speed) else 0
 
-        down_average_speed = df_velocity[df_velocity['velocidade_y'] < 0]['velocidade_y'].mean()
+        down_average_speed = df_velocity[df_velocity['y_variation'] > 0]['y_variation'].sum() / df_velocity[
+            'time_variation'].sum()
         self.down_average_speed = np.nanmean([self.down_average_speed, down_average_speed]) if (
-                    self.down_average_speed is not None and make_mean) else down_average_speed if not np.isnan(down_average_speed) else 0
+                self.down_average_speed is not None and make_mean) else down_average_speed if not np.isnan(
+            down_average_speed) else 0
 
-        right_average_speed = df_velocity[df_velocity['velocidade_x'] > 0]['velocidade_x'].mean()
+        right_average_speed = df_velocity[df_velocity['x_variation'] > 0]['x_variation'].sum() / df_velocity[
+            'time_variation'].sum()
         self.right_average_speed = np.nanmean([self.right_average_speed, right_average_speed]) if (
-                    self.right_average_speed is not None and make_mean) else right_average_speed if not np.isnan(right_average_speed) else 0
+                self.right_average_speed is not None and make_mean) else right_average_speed if not np.isnan(
+            right_average_speed) else 0
 
-        left_average_speed = df_velocity[df_velocity['velocidade_x'] < 0]['velocidade_x'].mean()
-        self.left_average_speed = np.nanmean([self.left_average_speed, left_average_speed]) if (
-                    self.left_average_speed is not None and make_mean) else left_average_speed if not np.isnan(left_average_speed) else 0
+        left_average_speed = df_velocity[df_velocity['x_variation'] < 0]['x_variation'].sum() / df_velocity[
+            'time_variation'].sum()
+        self.left_average_speed = np.nanmean([self.left_average_speed, up_average_speed]) if (
+                self.left_average_speed is not None and make_mean) else left_average_speed if not np.isnan(
+            left_average_speed) else 0
 
-        vertical_average_speed = df_velocity['velocidade_y'].abs().mean()
+        # Calculando velocidade média vertical e horizontal
+        vertical_average_speed = (self.up_average_speed + abs(self.down_average_speed)) / 2
         self.vertical_average_speed = np.nanmean([self.vertical_average_speed, vertical_average_speed]) if (
-                    self.vertical_average_speed is not None and make_mean) else vertical_average_speed if not np.isnan(vertical_average_speed) else 0
+                self.vertical_average_speed is not None and make_mean) else vertical_average_speed if not np.isnan(
+            vertical_average_speed) else 0
 
-        horizontal_average_speed = df_velocity['velocidade_x'].abs().mean()
+        horizontal_average_speed = (self.right_average_speed + abs(self.left_average_speed)) / 2
         self.horizontal_average_speed = np.nanmean([self.horizontal_average_speed, horizontal_average_speed]) if (
-                    self.horizontal_average_speed is not None and make_mean) else horizontal_average_speed if not np.isnan(horizontal_average_speed) else 0
+                self.horizontal_average_speed is not None and make_mean) else horizontal_average_speed if not np.isnan(
+            horizontal_average_speed) else 0
 
-        average_speed = df_velocity['velocidade'].mean()
+        # Calculando a velocidade média total
+        average_speed = (abs(self.up_average_speed) + abs(self.down_average_speed) + abs(
+            self.right_average_speed) + abs(self.left_average_speed)) / 4
         self.average_speed = np.nanmean([self.average_speed, average_speed]) if (
-                    self.average_speed is not None and make_mean) else average_speed if not np.isnan(average_speed) else 0
+                self.average_speed is not None and make_mean) else average_speed if not np.isnan(
+            average_speed) else 0
 
-        maximum_horizontal_speed = df_velocity['velocidade_x'].abs().max()
+        # Calculando as velocidades máximas e mínimas em cada direção
+        maximum_horizontal_speed = max(self.right_average_speed, abs(self.left_average_speed))
         self.maximum_horizontal_speed = np.nanmean([self.maximum_horizontal_speed, maximum_horizontal_speed]) if (
-                    self.maximum_horizontal_speed is not None and make_mean) else maximum_horizontal_speed if not np.isnan(maximum_horizontal_speed) else 0
+                self.maximum_horizontal_speed is not None and make_mean) else maximum_horizontal_speed if not np.isnan(
+            maximum_horizontal_speed) else 0
 
-        maximum_vertical_speed = df_velocity['velocidade_y'].abs().max()
-        self.maximum_vertical_speed = np.nanmean([self.maximum_vertical_speed, maximum_vertical_speed]) if (
-                    self.maximum_vertical_speed is not None and make_mean) else maximum_vertical_speed if not np.isnan(maximum_vertical_speed) else 0
-
-        minimum_horizontal_speed = df_velocity[df_velocity['velocidade_x'] != 0]['velocidade_x'].abs().min()
+        minimum_horizontal_speed = min(self.right_average_speed, abs(self.left_average_speed))
         self.minimum_horizontal_speed = np.nanmean([self.minimum_horizontal_speed, minimum_horizontal_speed]) if (
-                    self.minimum_horizontal_speed is not None and make_mean) else minimum_horizontal_speed if not np.isnan(minimum_horizontal_speed) else 0
+                self.minimum_horizontal_speed is not None and make_mean) else minimum_horizontal_speed if not np.isnan(
+            minimum_horizontal_speed) else 0
 
-        minimum_vertical_speed = df_velocity[df_velocity['velocidade_y'] != 0]['velocidade_y'].abs().min()
+        maximum_vertical_speed = max(self.up_average_speed, abs(self.down_average_speed))
+        self.maximum_vertical_speed = np.nanmean([self.maximum_vertical_speed, maximum_vertical_speed]) if (
+                self.maximum_vertical_speed is not None and make_mean) else maximum_vertical_speed if not np.isnan(
+            maximum_vertical_speed) else 0
+
+        minimum_vertical_speed = min(self.up_average_speed, abs(self.down_average_speed))
         self.minimum_vertical_speed = np.nanmean([self.minimum_vertical_speed, minimum_vertical_speed]) if (
-                    self.minimum_vertical_speed is not None and make_mean) else minimum_vertical_speed if not np.isnan(minimum_vertical_speed) else 0
+                self.minimum_vertical_speed is not None and make_mean) else minimum_vertical_speed if not np.isnan(
+            minimum_vertical_speed) else 0
 
-        maximum_speed = df_velocity['velocidade'].max()
+        # Calculando a velocidade máxima e mínima total
+        maximum_speed = max(abs(self.up_average_speed), abs(self.down_average_speed),
+                            abs(self.right_average_speed), abs(self.left_average_speed))
         self.maximum_speed = np.nanmean([self.maximum_speed, maximum_speed]) if (
-                    self.maximum_speed is not None and make_mean) else maximum_speed if not np.isnan(maximum_speed) else 0
+                self.maximum_speed is not None and make_mean) else maximum_speed if not np.isnan(
+            maximum_speed) else 0
 
-        minimum_speed = df_velocity[df_velocity['velocidade'] != 0]['velocidade'].min()
+        minimum_speed = min(abs(self.up_average_speed), abs(self.down_average_speed),
+                            abs(self.right_average_speed), abs(self.left_average_speed))
         self.minimum_speed = np.nanmean([self.minimum_speed, minimum_speed]) if (
-                    self.minimum_speed is not None and make_mean) else minimum_speed if not np.isnan(minimum_speed) else 0
+                self.minimum_speed is not None and make_mean) else minimum_speed if not np.isnan(
+            minimum_speed) else 0
 
         return [self.up_average_speed, self.down_average_speed, self.right_average_speed, self.left_average_speed,
                 self.vertical_average_speed, self.horizontal_average_speed, self.average_speed,
-                self.maximum_horizontal_speed, self.maximum_vertical_speed, self.minimum_horizontal_speed,
-                self.minimum_vertical_speed, self.maximum_speed, self.minimum_speed]
+                self.maximum_horizontal_speed, self.minimum_horizontal_speed, self.maximum_vertical_speed,
+                self.minimum_vertical_speed,
+                self.maximum_speed, self.minimum_speed]
 
     def extract_movement_metrics(self, mouse_movement_data: pd.DataFrame = None, make_mean: bool = True) -> list[Any]:
         """
@@ -210,7 +222,8 @@ class MouseAnalyses:
 
         # Contar os movimentos
         up_moves = (df_movement['mudanca_y'] > 0).sum()
-        self.up_moves = np.nanmean([self.up_moves, up_moves]) if (self.up_moves is not None and make_mean) else up_moves if not np.isnan(up_moves) else 0
+        self.up_moves = np.nanmean([self.up_moves, up_moves]) if (
+                self.up_moves is not None and make_mean) else up_moves if not np.isnan(up_moves) else 0
 
         down_moves = (df_movement['mudanca_y'] < 0).sum()
         self.down_moves = np.nanmean([self.down_moves, down_moves]) if (
@@ -227,12 +240,14 @@ class MouseAnalyses:
         horizontal_moves = self.right_moves + self.left_moves
         self.horizontal_moves = np.nanmean(
             [self.horizontal_moves, horizontal_moves]) if (
-                self.horizontal_moves is not None and make_mean) else horizontal_moves if not np.isnan(horizontal_moves) else 0
+                self.horizontal_moves is not None and make_mean) else horizontal_moves if not np.isnan(
+            horizontal_moves) else 0
 
         vertical_moves = self.up_moves + self.down_moves
         self.vertical_moves = np.nanmean(
             [self.vertical_moves, vertical_moves]) if (
-                self.vertical_moves is not None and make_mean) else vertical_moves if not np.isnan(vertical_moves) else 0
+                self.vertical_moves is not None and make_mean) else vertical_moves if not np.isnan(
+            vertical_moves) else 0
 
         return [self.up_moves, self.down_moves, self.right_moves, self.left_moves, self.horizontal_moves,
                 self.vertical_moves]
@@ -260,17 +275,20 @@ class MouseAnalyses:
         horizontal_distance = df_distance['diff_x'].abs().sum()
         self.horizontal_distance = np.nanmean([self.horizontal_distance,
                                                horizontal_distance]) if (
-                self.horizontal_distance is not None and make_mean) else horizontal_distance if not np.isnan(horizontal_distance) else 0
+                self.horizontal_distance is not None and make_mean) else horizontal_distance if not np.isnan(
+            horizontal_distance) else 0
 
         vertical_distance = df_distance['diff_y'].abs().sum()
         self.vertical_distance = np.nanmean(
             [self.vertical_distance, vertical_distance]) if (
-                self.vertical_distance is not None and make_mean) else vertical_distance if not np.isnan(vertical_distance) else 0
+                self.vertical_distance is not None and make_mean) else vertical_distance if not np.isnan(
+            vertical_distance) else 0
 
         total_distance = np.sqrt(df_distance['diff_x'] ** 2 + df_distance['diff_y'] ** 2).sum()
         self.total_distance = np.nanmean(
             [self.total_distance, total_distance]) if (
-                self.total_distance is not None and make_mean) else total_distance if not np.isnan(total_distance) else 0
+                self.total_distance is not None and make_mean) else total_distance if not np.isnan(
+            total_distance) else 0
 
         # Calcular as distâncias para cima, para baixo, para a esquerda e para a direita
         up_distance = df_distance[df_distance['diff_y'] > 0]['diff_y'].sum()
@@ -279,16 +297,21 @@ class MouseAnalyses:
 
         down_distance = -df_distance[df_distance['diff_y'] < 0]['diff_y'].sum()
         self.down_distance = np.nanmean(
-            [self.down_distance, down_distance]) if (self.down_distance is not None and make_mean) else down_distance if not np.isnan(down_distance) else 0
+            [self.down_distance, down_distance]) if (
+                self.down_distance is not None and make_mean) else down_distance if not np.isnan(
+            down_distance) else 0
 
         right_distance = df_distance[df_distance['diff_x'] > 0]['diff_x'].sum()
         self.right_distance = np.nanmean(
             [self.right_distance, right_distance]) if (
-                self.right_distance is not None and make_mean) else right_distance if not np.isnan(right_distance) else 0
+                self.right_distance is not None and make_mean) else right_distance if not np.isnan(
+            right_distance) else 0
 
         left_distance = -df_distance[df_distance['diff_x'] < 0]['diff_x'].sum()
         self.left_distance = np.nanmean(
-            [self.left_distance, left_distance]) if (self.left_distance is not None and make_mean) else left_distance if not np.isnan(left_distance) else 0
+            [self.left_distance, left_distance]) if (
+                self.left_distance is not None and make_mean) else left_distance if not np.isnan(
+            left_distance) else 0
 
         return [self.horizontal_distance, self.vertical_distance, self.total_distance, self.up_distance,
                 self.down_distance, self.right_distance, self.left_distance]
@@ -327,9 +350,11 @@ class MouseAnalyses:
 
         # Encontra os pares 'press' e 'release' para o mesmo botão
         for button in [Button.right, Button.left]:
-            press_times = df_clicks[(df_clicks['button'] == str(button)) & (df_clicks['status'] == ClickStatus.PRESS.value)][
+            press_times = \
+                df_clicks[(df_clicks['button'] == str(button)) & (df_clicks['status'] == ClickStatus.PRESS.value)][
                     'time']
-            release_times = df_clicks[(df_clicks['button'] == str(button)) & (df_clicks['status'] == ClickStatus.RELEASE.value)][
+            release_times = \
+                df_clicks[(df_clicks['button'] == str(button)) & (df_clicks['status'] == ClickStatus.RELEASE.value)][
                     'time']
 
             # Certificar que existe o mesmo número de eventos 'press' e 'release'
@@ -352,19 +377,25 @@ class MouseAnalyses:
 
         right_click_total_duration = click_pairs[click_pairs['button'] == str(Button.right)]['duration'].sum()
         self.right_click_total_duration = np.nanmean([self.right_click_total_duration, right_click_total_duration]) if (
-                    self.right_click_total_duration is not None and make_mean) else right_click_total_duration if not np.isnan(right_click_total_duration) else 0
+                self.right_click_total_duration is not None and make_mean) else right_click_total_duration if not np.isnan(
+            right_click_total_duration) else 0
 
         left_click_total_duration = click_pairs[click_pairs['button'] == str(Button.left)]['duration'].sum()
         self.left_click_total_duration = np.nanmean([self.left_click_total_duration, left_click_total_duration]) if (
-                    self.left_click_total_duration is not None and make_mean) else left_click_total_duration if not np.isnan(left_click_total_duration) else 0
+                self.left_click_total_duration is not None and make_mean) else left_click_total_duration if not np.isnan(
+            left_click_total_duration) else 0
 
         right_click_average_duration = click_pairs[click_pairs['button'] == str(Button.right)]['duration'].mean()
-        self.right_click_average_duration = np.nanmean([self.right_click_average_duration, right_click_average_duration]) if (
-                self.right_click_average_duration is not None and make_mean) else right_click_average_duration if not np.isnan(right_click_average_duration) else 0
+        self.right_click_average_duration = np.nanmean(
+            [self.right_click_average_duration, right_click_average_duration]) if (
+                self.right_click_average_duration is not None and make_mean) else right_click_average_duration if not np.isnan(
+            right_click_average_duration) else 0
 
         left_click_average_duration = click_pairs[click_pairs['button'] == str(Button.left)]['duration'].mean()
-        self.left_click_average_duration = np.nanmean([self.left_click_average_duration, left_click_average_duration]) if (
-                self.left_click_average_duration is not None and make_mean) else left_click_average_duration if not np.isnan(left_click_average_duration) else 0
+        self.left_click_average_duration = np.nanmean(
+            [self.left_click_average_duration, left_click_average_duration]) if (
+                self.left_click_average_duration is not None and make_mean) else left_click_average_duration if not np.isnan(
+            left_click_average_duration) else 0
 
         return [self.total_clicks, self.right_clicks, self.left_clicks, self.right_click_total_duration,
                 self.left_click_total_duration, self.right_click_average_duration, self.left_click_average_duration]
@@ -378,9 +409,9 @@ class MouseAnalyses:
             'vertical_average_speed': self.vertical_average_speed,
             'horizontal_average_speed': self.horizontal_average_speed,
             'average_speed': self.average_speed,
-            'maximum_horizontal_speed': self.maximum_speed,
+            'maximum_horizontal_speed': self.maximum_horizontal_speed,
             'maximum_vertical_speed': self.maximum_vertical_speed,
-            'minimum_horizontal_speed': self.horizontal_average_speed,
+            'minimum_horizontal_speed': self.minimum_horizontal_speed,
             'minimum_vertical_speed': self.minimum_vertical_speed,
             'maximum_speed': self.maximum_speed,
             'minimum_speed': self.minimum_speed,
@@ -423,3 +454,5 @@ if __name__ == '__main__':
     for click_data in list_mouse_click_data:
         analyses.mouse_click_data = click_data
         analyses.extract_clicks_metrics()
+
+    print(analyses.generate_dataframe())
