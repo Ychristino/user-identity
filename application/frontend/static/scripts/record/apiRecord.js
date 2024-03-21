@@ -13,6 +13,7 @@ const START_RECORD = async () => {
                                 user_running: USERNAME
                             }
         const response = await API.post(API_START_RECORD, BODY_DATA);
+        return response.data;
     } catch (error) {
         console.error('Falha ao iniciar a gravação:', error);
     }
@@ -21,6 +22,7 @@ const START_RECORD = async () => {
 const STOP_RECORD = async () => {
     try {
         const response = await API.post(API_STOP_RECORD);
+        return response.data;
     } catch (error) {
         console.error('Falha ao iniciar a gravação:', error);
     }

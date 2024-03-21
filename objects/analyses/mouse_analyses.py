@@ -1,3 +1,4 @@
+import os
 from typing import Tuple, List, Any
 
 import numpy as np
@@ -8,7 +9,7 @@ from pandas import DataFrame, Series
 from pynput.mouse import Button
 
 from common.click_status import ClickStatus
-from common.constants import MOUSE_FILE
+from common.constants import MOUSE_FILE, BASE_DIR
 
 
 def read_file(mouse_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
@@ -381,13 +382,14 @@ class MouseAnalyses:
                 'right_click_average_duration': self.right_click_average_duration,
                 'left_click_average_duration': self.left_click_average_duration,
             }
-
-        return pd.DataFrame(data, index=[0])
+        df_return = pd.DataFrame([data])
+        df_return.replace([np.inf, -np.inf, np.nan], [np.finfo(float).max, np.finfo(float).min, 0], inplace=True)
+        return df_return.iloc[0]
 
 
 if __name__ == '__main__':
     analyses = MouseAnalyses()
-    list_mouse_movement_data, list_mouse_click_data = read_file(f'../../files/user/{MOUSE_FILE}')
+    list_mouse_movement_data, list_mouse_click_data = read_file(os.path.join(BASE_DIR, 'files', 'user', MOUSE_FILE))
 
     for move_data in list_mouse_movement_data:
         analyses.mouse_movement_data = move_data

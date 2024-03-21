@@ -1,4 +1,4 @@
-async function plot2DDensityPlot(data, plot_destination) {
+function plot2DDensityPlot(data, plot_destination) {
 
     // Extrair coordenadas X e Y dos dados
     const xCoords = data.map(item => item.x_position);
@@ -9,17 +9,17 @@ async function plot2DDensityPlot(data, plot_destination) {
         x: xCoords,
         y: yCoords,
         type: 'histogram2dcontour', // Definir o tipo de gráfico como histograma de contorno 2D
-        colorscale: [[0, 'rgba(0, 0, 128, 1)'],
+        colorscale: [[0, 'rgba(0, 0, 0, 0)'],
                      [0.1, 'rgba(0, 0, 255, 1)'],
                      [0.2, 'rgba(0, 128, 255, 1)'],
                      [0.3, 'rgba(0, 255, 255, 1)'],
-                     [0.4, 'rgba(128, 255, 128, 1)'],
-                     [0.5, 'rgba(255, 255, 0, 1)'],
-                     [0.6, 'rgba(255, 255, 0, 1)'],
-                     [0.7, 'rgba(255, 128, 0, 1)'],
-                     [0.8, 'rgba(255, 0, 0, 1)'],
-                     [0.9, 'rgba(128, 0, 0, 1)'],
-                     [1, 'rgba(128, 0, 128, 1)']
+                     [0.4, 'rgba(0, 255, 128, 1)'],
+                     [0.5, 'rgba(0, 255, 0, 1)'],
+                     [0.6, 'rgba(69, 255, 0, 1)'],
+                     [0.7, 'rgba(128, 255, 0, 1)'],
+                     [0.8, 'rgba(255, 255, 0, 1)'],
+                     [0.9, 'rgba(255, 128, 0, 1)'],
+                     [1.0, 'rgba(255, 69, 0, 1)']
                     ]
         , // Especificar a escala de cores
         reversescale: false, // Inverter a escala de cores
@@ -46,11 +46,23 @@ async function plot2DDensityPlot(data, plot_destination) {
         },
         // Definir o fundo como transparente
         plot_bgcolor: 'rgba(0, 0, 0, 0)',
-        paper_bgcolor: 'rgba(0, 0, 0, 0)'
+        paper_bgcolor: 'rgba(0, 0, 0, 0)',
+        annotations: [
+            {
+                text: `Total data length: ${data.length}`, // Mensagem da legenda
+                showarrow: false,
+                x: 0.5, // Posição horizontal do texto
+                y: 1.1, // Posição vertical do texto
+                xanchor: 'center', // Ancoragem horizontal
+                yanchor: 'bottom', // Ancoragem vertical
+                xref: 'paper', // Referência horizontal
+                yref: 'paper', // Referência vertical
+            }
+        ]
     };
 
     // Plotar o gráfico de densidade 2D no elemento HTML com o id 'densityPlot'
-    Plotly.newPlot(plot_destination, densityPlotData, layout);
+    Plotly.newPlot(plot_destination, densityPlotData, layout, {responsive: true});
 }
 
 export { plot2DDensityPlot };

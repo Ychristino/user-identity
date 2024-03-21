@@ -14,7 +14,7 @@ class RecordController:
             user_running = data.get('user_running')
 
         if user_running:
-            if record_service.run_record(user_running):
+            if record_service.start_record(user_running):
                 return jsonify({"message": f"Recording started for {str(user_running)}"}), 200
             else:
                 return jsonify({"error": "Recording is already in progress"}), 400

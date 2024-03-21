@@ -17,7 +17,7 @@ class MouseMonitor:
         self.stop_flag = False
         self.recorded_data = {"move": [], "click": []}
 
-    def on_move(self, x: int, y: int) -> None:
+    def on_move(self, x: int, y: int) -> bool:
         """
         Evento de movimentação do ponteiro, dispara a gravação do dado na estrutura 'move'.
         :param x: Posição 'X' (horizontal) do ponteiro
@@ -29,7 +29,7 @@ class MouseMonitor:
         elapsed_time = time.time() - self.start_time
         self.recorded_data["move"].append({"x_position": x, "y_position": y, "time": elapsed_time})
 
-    def on_click(self, x: int, y: int, button, pressed) -> None:
+    def on_click(self, x: int, y: int, button, pressed) -> bool:
         """
         Evento de click do mouse, dispara a gravação do dado na estrutura 'click'
         :param x: Posição 'X' (horizontal) do ponteiro

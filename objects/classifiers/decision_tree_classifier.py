@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
-from common.constants import MOUSE_FILE, KEYBOARD_FILE
+from common.constants import MOUSE_FILE, KEYBOARD_FILE, BASE_DIR
 from objects.analyses.keyboard_analyses import KeyboardAnalyses
 from objects.analyses.mouse_analyses import MouseAnalyses
 from objects.classifiers.classifier import Classifier, metrics
@@ -24,7 +24,7 @@ class TreeClassifier(Classifier):
     def create_classifier(self):
         self.classifier = DecisionTreeClassifier()
 
-    def execute(self, base_directory: str = './files'):
+    def execute(self, base_directory: str = os.path.join(BASE_DIR, 'files')):
 
         labels_executed = []
         merge_control = 0
@@ -60,4 +60,4 @@ class TreeClassifier(Classifier):
 
 if __name__ == '__main__':
     classifier = TreeClassifier()
-    classifier.execute(base_directory='..\\..\\files')
+    classifier.execute(base_directory=os.path.join(BASE_DIR, 'files'))

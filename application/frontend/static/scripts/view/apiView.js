@@ -5,8 +5,9 @@ const API = new ApiRequest(BASE_URL);
 
 const MOUSE_MOVE = async (username) => {
     try {
-        const response = await API.get(API_MOUSE_MOVE + '/' + username);
-        return response;
+        console.log(API.get_user_endpoint(API_MOUSE_MOVE, username))
+        const response = await API.get(API.get_user_endpoint(API_MOUSE_MOVE, username));
+        return response.data;
     } catch (error) {
         console.error('Falha ao obter dados do usuário:', error);
         return null;
@@ -16,7 +17,7 @@ const MOUSE_MOVE = async (username) => {
 const USER_LIST = async () => {
     try {
         const response = await API.get(API_USER_LIST);
-        return response;
+        return response.data
     } catch (error) {
         console.error('Falha ao obter lista de usuários:', error);
         return null;

@@ -5,7 +5,7 @@ import json
 import inspect
 from typing import Tuple, List, Any
 
-from common.constants import MOUSE_FILE, KEYBOARD_FILE
+from common.constants import MOUSE_FILE, KEYBOARD_FILE, BASE_DIR
 from objects.monitor.keyboard_monitor import KeyboardMonitor
 from objects.monitor.mouse_monitor import MouseMonitor
 
@@ -78,7 +78,7 @@ class RecordData:
         """
         caller_method = inspect.stack()[1][3]
 
-        data_path = f'./files/{self.username}/'
+        data_path = os.path.join(BASE_DIR, 'files', self.username)
 
         if not os.path.exists(data_path):
             os.makedirs(data_path)

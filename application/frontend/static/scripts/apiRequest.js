@@ -40,5 +40,14 @@ class ApiRequest {
             throw error;
         }
     }
+
+    get_user_endpoint(endpoint, username){
+        if (username === undefined || username.trim() === "") {
+            return endpoint.replace("/{username}", "");
+        }
+        return endpoint.replace("{username}", username);
+    }
+
 }
+
 export { ApiRequest };

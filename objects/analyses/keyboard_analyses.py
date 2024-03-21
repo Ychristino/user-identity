@@ -1,11 +1,12 @@
 import json
+import os
 from typing import Tuple, List, Any
 
 import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
 
-from common.constants import KEYBOARD_FILE
+from common.constants import KEYBOARD_FILE, BASE_DIR
 
 
 def read_file(keyboard_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
@@ -108,12 +109,14 @@ class KeyboardAnalyses:
                 'average_interval_beween_keys': self.average_interval_between_keys
             }
 
-        return pd.DataFrame(data, index=[0])
+        df_return = pd.DataFrame([data])
+        df_return.replace([np.inf, -np.inf, np.nan], [np.finfo(float).max, np.finfo(float).min, 0], inplace=True)
+        return df_return.iloc[0]
 
 
 if __name__ == '__main__':
     analyses = KeyboardAnalyses()
-    list_keyboard_press_data, list_keyboard_release_data = read_file(f'../../files/user/{KEYBOARD_FILE}')
+    list_keyboard_press_data, list_keyboard_release_data = read_file(os.path.join(BASE_DIR, 'files', 'user', KEYBOARD_FILE))
 
     for index in range(len(list_keyboard_press_data)):
         analyses.keyboard_press_data = list_keyboard_press_data[index]

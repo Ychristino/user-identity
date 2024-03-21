@@ -21,24 +21,35 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById('generateGraph').addEventListener('click', ()=>{
     const PLOT_SELECTED = document.getElementById('graphType').value;
     const SELECTED_USER = document.getElementById('user').value;
+    const GRAPH_PLOT = document.getElementById('graphPlot');
+    const LOADING_SPINNER = document.getElementById("loading").style
+
+    GRAPH_PLOT.innerHTML = '';
+    LOADING_SPINNER.display = "block";
 
     switch(PLOT_SELECTED.toLowerCase()){
         case 'heatmap':
             MOUSE_MOVE(SELECTED_USER)
             .then(mouse_data=>{
-                plot2DDensityPlot(mouse_data, 'graphPlot')
+                plot2DDensityPlot(mouse_data, 'graphPlot');
             })
             .catch(error => {
                 console.error('Erro ao obter dados do usuários:', error);
+            })
+            .finally(()=>{
+                LOADING_SPINNER.display = "none";
             });
             break;
         case 'scatterplot':
             MOUSE_MOVE(SELECTED_USER)
             .then(mouse_data=>{
-                plotScatterPlot(mouse_data, 'graphPlot')
+                plotScatterPlot(mouse_data, 'graphPlot');
             })
             .catch(error => {
                 console.error('Erro ao obter dados do usuários:', error);
+            })
+            .finally(()=>{
+                LOADING_SPINNER.display = "none";
             });
             break;
         case 'statistics':
@@ -48,6 +59,7 @@ document.getElementById('generateGraph').addEventListener('click', ()=>{
         default:
             alert("You know that's an invalid option... don't do that...");
     }
+
 });
 
 document.getElementById('graphType').addEventListener('change', (event)=>{

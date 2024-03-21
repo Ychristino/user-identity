@@ -9,7 +9,7 @@ class RecordService:
         self.record_data = None
         self.recording_thread = None
 
-    def run_record(self, user_running: str):
+    def start_record(self, user_running: str):
         if not self.recording:
             self.record_data = RecordData(user_running)
             self.recording_thread = threading.Thread(target=self.record_data.record_all)

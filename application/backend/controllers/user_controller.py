@@ -6,7 +6,7 @@ user_service = UserService()
 
 class UserController:
     @staticmethod
-    def check_user(username=None):
+    def check_user(username: str = None):
         return jsonify(user_service.get_user_data(username))
 
     @staticmethod

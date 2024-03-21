@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 
 from abc import ABC, abstractmethod
 
-from common.constants import MOUSE_FILE, KEYBOARD_FILE
+from common.constants import MOUSE_FILE, KEYBOARD_FILE, BASE_DIR
 from objects.analyses.mouse_analyses import MouseAnalyses
 from objects.analyses.keyboard_analyses import KeyboardAnalyses
 from objects.analyses.keyboard_analyses import read_file as read_keyboard_file
@@ -126,7 +126,7 @@ class Classifier(ABC):
     def run_prediction(self, data_to_predict):
         return self.classifier.predict(data_to_predict)
 
-    def execute(self, base_directory: str = './files'):
+    def execute(self, base_directory: str = os.path.join(BASE_DIR, 'files')):
 
         labels_executed = []
         merge_control = 0

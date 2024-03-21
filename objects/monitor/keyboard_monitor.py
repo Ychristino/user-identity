@@ -15,7 +15,7 @@ class KeyboardMonitor:
         self.stop_flag = False
         self.recorded_data = {"press": [], "release": []}
 
-    def on_press(self, key: Key | KeyCode) -> None:
+    def on_press(self, key: Key | KeyCode) -> bool:
         """
         Evento de tecla pressionada, dispara a gravação do dado na estrtura 'press'
         :param key: Tecla que foi pressionada
@@ -26,7 +26,7 @@ class KeyboardMonitor:
         elapsed_time = time.time() - self.start_time
         self.recorded_data["press"].append({"key": str(key), "time": elapsed_time})
 
-    def on_release(self, key: Key | KeyCode) -> None:
+    def on_release(self, key: Key | KeyCode) -> bool:
         """
         Evento de tecla solta, dispara a gravação do dado na estrutura 'release'
         :param key: Tecla que foi solta
