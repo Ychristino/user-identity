@@ -1,6 +1,7 @@
 import { USER_LIST, MOUSE_MOVE, FULL_DATA } from './apiView.js';
 import { plotScatterPlot } from './generateScatterplot.js';
 import { plot2DDensityPlot } from './generate2DDensity.js';
+import { plotGroupBar } from './generateGroupBar.js';
 
 document.addEventListener("DOMContentLoaded", function () {
     USER_LIST()
@@ -70,10 +71,10 @@ async function plot_graph(graph_type, username) {
                 break;
             case 'comparative':
                 const GROUPBAR_DATA = await FULL_DATA();
-                console.log(GROUPBAR_DATA)
+                plotGroupBar(GROUPBAR_DATA, 'graphPlot')
                 break;
             default:
-                alert("Você escolheu uma opção inválida. Por favor, escolha outra opção.");
+                alert("You know that's an invalid option... Please, don't do that.");
         }
     } catch (error) {
         console.error('Erro ao obter dados do usuário:', error);

@@ -83,9 +83,8 @@ class StatisticsService:
                 user_mouse_file_path = os.path.join(self.base_path, user_folder, MOUSE_FILE)
                 user_keyboard_file_path = os.path.join(self.base_path, user_folder, KEYBOARD_FILE)
                 user_data['data'].append({
-                    user_folder: {
+                        'username': user_folder,
                         'mouse_info': json.loads(_generate_mouse_stats(user_mouse_file_path=user_mouse_file_path)),
                         'keyboard_info': json.loads(_generate_keyboard_stats(user_keyboard_file_path=user_keyboard_file_path))
-                    }
                 })
         return user_data
