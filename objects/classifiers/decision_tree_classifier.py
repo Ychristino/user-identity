@@ -32,15 +32,15 @@ class TreeClassifier(Classifier):
             merge_control += 1
             for folder in subdirectory:
                 merge_control += 1
+                labels_executed.append(folder)
                 self.load_mouse_analyses(mouse_file_path=os.path.join(root, folder, MOUSE_FILE),
                                          identifier_label=folder,
                                          merge_control=merge_control)
                 self.load_keyboard_analyses(keyboard_file_path=os.path.join(root, folder, KEYBOARD_FILE),
                                             identifier_label=folder,
                                             merge_control=merge_control)
-                labels_executed.append(labels_executed)
 
-        x_train, x_test, y_train, y_test = self.prepare_data(validation_column_label='expected')
+        x_train, x_test, y_train, y_test = self.prepare_data(validation_column_label='expected', filter_one_member_only=True)
         self.create_classifier()
 
         self.execute_train(data_to_train=x_train, expected_value=y_train)
@@ -60,4 +60,4 @@ class TreeClassifier(Classifier):
 
 if __name__ == '__main__':
     classifier = TreeClassifier()
-    classifier.execute(base_directory=os.path.join(BASE_DIR, 'files'))
+    classifier.execute(base_directory=os.path.join('../../', 'files'))

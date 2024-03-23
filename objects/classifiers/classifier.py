@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 
 from sklearn.metrics import classification_report, precision_recall_fscore_support
@@ -68,6 +69,8 @@ class Classifier(ABC):
             # VELOCIDADE | MOVIMENTACAO | DISTANCIA | CLICKS | DURACAO DOS CLICKS
             self.df_mouse_stats = self.df_mouse_stats._append(new_df, ignore_index=True)
 
+        return self.df_mouse_stats
+
     def load_keyboard_analyses(self,
                                keyboard_file_path: str,
                                identifier_label: str,
@@ -86,24 +89,41 @@ class Classifier(ABC):
 
             self.df_keyboard_stats = self.df_keyboard_stats._append(new_df, ignore_index=True)
 
+        return self.df_keyboard_stats
+
     def prepare_data(self,
                      validation_column_label: str = 'expected',
                      test_size: float = 0.2,
                      random_state: int = 42,
                      use_mouse_data: bool = True,
                      use_keyboard_data: bool = True,
-                     fill_na_values: bool = True):
+                     fill_na_values: bool = True,
+                     filter_one_member_only: bool = False,
+                     require_both: bool = True):
 
         if use_mouse_data and use_keyboard_data:
             assert ('merge_control' in self.df_mouse_stats) and ('merge_control' in self.df_keyboard_stats)
 
         combined_data = pd.DataFrame()
-
         if use_mouse_data:
-            combined_data = self.df_mouse_stats
+            combined_data = self.df_mouse_stats.copy()
+        elif not require_both:
+            combined_data = pd.DataFrame(
+                columns=self.df_keyboard_stats.columns)  # Cria um DataFrame vazio com as colunas do df_keyboard_stats
 
         if use_keyboard_data:
-            combined_data = pd.merge(combined_data, self.df_keyboard_stats, on=['merge_control', 'expected'])
+            if combined_data.empty:
+                combined_data = self.df_keyboard_stats.copy()
+            else:
+                combined_data = pd.merge(combined_data, self.df_keyboard_stats, on=['merge_control', 'expected'],
+                                         how='outer')
+        elif not require_both:
+            if combined_data.empty:
+                combined_data = pd.DataFrame(
+                    columns=self.df_mouse_stats.columns)  # Cria um DataFrame vazio com as colunas do df_mouse_stats
+                missing_columns = [col for col in self.df_keyboard_stats.columns if col not in combined_data.columns]
+                for col in missing_columns:
+                    combined_data[col] = 0  # Fill missing columns with zeros
 
         combined_data = combined_data.drop(['merge_control'], axis=1)
 
@@ -114,7 +134,22 @@ class Classifier(ABC):
             x = x.fillna(0)
             y = y.fillna('guest')
 
-        return train_test_split(x, y, test_size=test_size, random_state=random_state, stratify=y)
+        if filter_one_member_only:
+            # Contagem de ocorrências de cada classe
+            unique_classes, class_counts = np.unique(y, return_counts=True)
+
+            # Encontre as classes que têm apenas um registro
+            single_instance_classes = unique_classes[class_counts == 1]
+
+            # Remova as classes com apenas um membro do conjunto de dados
+            combined_data = combined_data[~combined_data[validation_column_label].isin(single_instance_classes)]
+            x = combined_data.drop(validation_column_label, axis=1)
+            y = combined_data[validation_column_label]
+
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size, random_state=random_state,
+                                                            stratify=y)
+
+        return x_train, x_test, y_train, y_test
 
     @abstractmethod
     def create_classifier(self):
@@ -142,7 +177,7 @@ class Classifier(ABC):
                                             merge_control=merge_control)
                 labels_executed.append(labels_executed)
 
-        x_train, x_test, y_train, y_test = self.prepare_data(validation_column_label='expected')
+        x_train, x_test, y_train, y_test = self.prepare_data(validation_column_label='expected', filter_one_member_only=True)
         self.create_classifier()
 
         self.execute_train(data_to_train=x_train, expected_value=y_train)
