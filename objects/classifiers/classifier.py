@@ -61,6 +61,8 @@ class Classifier(ABC):
                 self.mouse_analyses.mouse_click_data = list_mouse_click_data[index]
                 self.mouse_analyses.extract_clicks_metrics(make_mean=False)
 
+            self.mouse_analyses.extract_general_metrics(make_mean=False)
+
             new_df = self.mouse_analyses.generate_dataframe()
             new_df['expected'] = identifier_label
 

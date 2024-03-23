@@ -99,6 +99,11 @@ class MouseAnalyses:
         self.right_click_average_duration = None
         self.left_click_average_duration = None
 
+        # STOP
+        self.non_movement_time = None
+        self.non_clicks_time = None
+        self.non_action_time = None
+
     def extract_velocity_metrics(self, mouse_movement_data: pd.DataFrame = None, make_mean: bool = True) -> list[Any]:
         """
         Realiza a extração dos dados e métricas do mouse, como velocidade de movimentação, velocidade mínima e máxima dos movimento, etc.
@@ -400,6 +405,66 @@ class MouseAnalyses:
         return [self.total_clicks, self.right_clicks, self.left_clicks, self.right_click_total_duration,
                 self.left_click_total_duration, self.right_click_average_duration, self.left_click_average_duration]
 
+    def extract_general_metrics(self, mouse_click_data: pd.DataFrame = None,
+                                mouse_movement_data: pd.DataFrame = None,
+                                make_mean: bool = True,
+                                move_interval_tolerance: float = 0.1,
+                                click_interval_tolerance: float = 0.1
+                                ) -> list[Any]:
+        """
+        Realiza a extração dos dados e métricas gerais do mouse, como tempo sem movimentos, tempo sem click, etc.
+        :param mouse_click_data: Dataframe de dados de evento 'click' do mouse
+        :param mouse_movement_data: Dataframe de dados de evento 'move' do mouse
+        :param make_mean: Se já existir um valor anterior gravado, calcula a média entre o atual e o anterior
+        :param move_interval_tolerance: Tolerância em segundos entre os eventos, a fim de que seja considerado um movimento contínuo ou tempo ocioso
+        :param click_interval_tolerance: Tolerância em segundos entre os eventos, a fim de que seja considerado um duplo click ou tempo ocioso
+        :return: Lista com todas as métricas extraídas da leitura dos dados
+        """
+        if mouse_click_data is not None:
+            df_clicks = mouse_click_data
+        else:
+            df_clicks = self.mouse_click_data[['x_position', 'y_position', 'button', 'status', 'time']]
+
+        if mouse_movement_data is not None:
+            df_movement = mouse_movement_data
+        else:
+            df_movement = self.mouse_movement_data[['x_position', 'y_position', 'time']]
+
+        df_movement = df_movement.sort_values(by='time')
+        df_clicks = df_clicks.sort_values(by='time')
+
+        # Criando a coluna time_interval com valores nulos
+        df_movement['time_interval'] = np.nan
+        df_clicks['time_interval'] = np.nan
+
+        df_movement['time_interval'] = df_movement['time'].diff()
+        df_clicks['time_interval'] = df_clicks['time'].diff()
+
+        # Replicando o tempo na coluna time_interval apenas na primeira linha
+        if len(df_movement) > 0:
+            df_movement.loc[df_movement.index[0], 'time_interval'] = df_movement.iloc[0]['time']
+        if len(df_clicks) > 0:
+            df_clicks.loc[df_clicks.index[0], 'time_interval'] = df_clicks.iloc[0]['time']
+
+        df_non_movement = df_movement[df_movement['time_interval'] > move_interval_tolerance]
+        df_non_clicks = df_clicks[df_clicks['time_interval'] > click_interval_tolerance]
+
+        total_non_movement_time = df_non_movement['time_interval'].sum()
+        self.non_movement_time = np.nanmean(
+            [self.non_movement_time, total_non_movement_time]) if (
+                self.non_movement_time is not None and make_mean) else total_non_movement_time if not np.isnan(
+            total_non_movement_time) else 0
+
+        total_non_clicks_time = df_non_clicks['time_interval'].sum()
+        self.non_clicks_time = np.nanmean(
+            [self.non_clicks_time, total_non_clicks_time]) if (
+                self.non_clicks_time is not None and make_mean) else total_non_clicks_time if not np.isnan(
+            total_non_clicks_time) else 0
+
+        self.non_action_time = self.non_movement_time + self.non_clicks_time
+
+        return [self.non_movement_time, self.non_clicks_time, self.non_action_time]
+
     def generate_dataframe(self):
         data = {
             'up_average_speed': self.up_average_speed,
@@ -435,6 +500,9 @@ class MouseAnalyses:
             'left_click_total_duration': self.left_click_total_duration,
             'right_click_average_duration': self.right_click_average_duration,
             'left_click_average_duration': self.left_click_average_duration,
+            'non_movement_time': self.non_movement_time,
+            'non_clicks_time': self.non_clicks_time,
+            'non_action_time': self.non_action_time,
         }
         df_return = pd.DataFrame([data])
         return df_return.iloc[0]
