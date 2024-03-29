@@ -28,14 +28,22 @@
     <!-- Seção de recursos -->
     <section class="py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
+            <div class="row d-flex justify-content-between">
+                <div class="col-lg-4 mb-4">
                     <h3>Record Data</h3>
-                    <p>That's the place where you can create a new Data-set and create profiles for every user. Click on the button bellow and start recording a new data.</p>
+                    <p class="lead">That's the place where you can create a new Data-set and create profiles for every user. Click on the button bellow and start recording a new data.</p>
                     <a href="/record" class="btn btn-primary d-block w-100">Start Prevention</a>
+                </div>
+
+                <div class="col-lg-4 mb-4">
+                    <h3>Visualize Data</h3>
+                    <p class="lead">That's the place where you can check some graphs about the records. Come check the most common area you are using or how are your metrics compared to the other users.</p>
+                    <a href="/view" class="btn btn-primary d-block w-100">Start Prevention</a>
                 </div>
             </div>
         </div>
     </section>
+
+
 </div>
 {% endblock %}

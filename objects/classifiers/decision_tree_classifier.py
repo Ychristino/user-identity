@@ -40,7 +40,11 @@ class TreeClassifier(Classifier):
                                             identifier_label=folder,
                                             merge_control=merge_control)
 
-        x_train, x_test, y_train, y_test = self.prepare_data(validation_column_label='expected', filter_one_member_only=True)
+        raw_x_train, raw_x_test, y_train, y_test = self.prepare_data(validation_column_label='expected',
+                                                                     filter_one_member_only=True)
+
+        x_train, x_test = self.pre_processor(raw_x_train, raw_x_test)
+
         self.create_classifier()
 
         self.execute_train(data_to_train=x_train, expected_value=y_train)
@@ -53,8 +57,8 @@ class TreeClassifier(Classifier):
                                                      current_predictions=predictions)
 
         plt.figure(figsize=(10, 10))  # Ajuste o tamanho da figura conforme necessário
-        plot_tree(self.classifier, filled=True, feature_names=x_test.columns,
-                  class_names=True)
+        plot_tree(self.classifier, filled=True, feature_names=raw_x_train.columns,
+                  class_names=labels_executed)
         plt.show()
 
 

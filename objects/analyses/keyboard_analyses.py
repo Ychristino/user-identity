@@ -9,11 +9,14 @@ from pandas import DataFrame, Series
 from common.constants import KEYBOARD_FILE, BASE_DIR
 
 
-def read_file(keyboard_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
+def read_file(keyboard_file_path: str,
+              split_data_every_n_seconds: int = None) -> tuple[list[pd.DataFrame], list[pd.DataFrame]]:
     """
     Realiza a leitura dos arquivos gravados de eventos do teclado, transformando-os em Dataframes para execução das
     leituras necessárias.
     :param keyboard_file_path: Caminho do arquivo de dados do teclado
+    :param split_data_every_n_seconds: Intervalo de tempo em segundos limite para a aamostra, se o limite for superado, um novo conjunto é criado a partir da amostra. Se for None, lê a estrutura
+    inteira sem quebras por tempo.
     :return: Lista de Dataframes de eventos 'press' do teclado, Lista de Dataframes de eventos 'release' do teclado
     """
     with open(keyboard_file_path, 'r') as f:
@@ -30,8 +33,27 @@ def read_file(keyboard_file_path: str) -> tuple[list[DataFrame], list[DataFrame]
             if df_keyboard_press_data.empty or df_keyboard_release_data.empty:
                 continue
 
-            list_df_keyboard_press_data.append(df_keyboard_press_data)
-            list_df_keyboard_release_data.append(df_keyboard_release_data)
+            if split_data_every_n_seconds is None:
+                list_df_keyboard_press_data.append(df_keyboard_press_data)
+                list_df_keyboard_release_data.append(df_keyboard_release_data)
+            else:
+                # Adiciona uma nova coluna para marcar o intervalo de tempo
+                df_keyboard_press_data['interval'] = (df_keyboard_press_data['time'] / split_data_every_n_seconds).astype(int)
+                df_keyboard_release_data['interval'] = (df_keyboard_release_data['time'] / split_data_every_n_seconds).astype(int)
+
+                # Calcula o tempo ajustado
+                df_keyboard_press_data['time'] = df_keyboard_press_data['time'] - (df_keyboard_press_data['interval'] * split_data_every_n_seconds)
+                df_keyboard_release_data['time'] = df_keyboard_release_data['time'] - (df_keyboard_release_data['interval'] * split_data_every_n_seconds)
+
+                # Agrupa os dados por intervalo
+                grouped_press_data = df_keyboard_press_data.groupby('interval')
+                grouped_release_data = df_keyboard_release_data.groupby('interval')
+
+                # Divide os dados em DataFrames separados por intervalo
+                for interval, group_press in grouped_press_data:
+                    list_df_keyboard_press_data.append(group_press)
+                    if interval in grouped_release_data.groups:
+                        list_df_keyboard_release_data.append(grouped_release_data.get_group(interval))
 
     return list_df_keyboard_press_data, list_df_keyboard_release_data
 

@@ -12,11 +12,14 @@ from common.click_status import ClickStatus
 from common.constants import MOUSE_FILE, BASE_DIR
 
 
-def read_file(mouse_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
+def read_file(mouse_file_path: str,
+              split_data_every_n_seconds: int = None) -> tuple[list[pd.DataFrame], list[pd.DataFrame]]:
     """
     Realiza a leitura dos arquivos gravados de eventos do mouse, transformando-os em Dataframes para execução das
     leituras necessárias.
     :param mouse_file_path: Caminho do arquivo de dados do mouse
+    :param split_data_every_n_seconds: Intervalo de tempo em segundos limite para a aamostra, se o limite for superado, um novo conjunto é criado a partir da amostra. Se for None, lê a estrutura
+    inteira sem quebras por tempo.
     :return: Lista de Dataframes de eventos 'move' do mouse, Lista de Dataframes de eventos 'click' do mouse
     """
     with open(mouse_file_path, 'r') as f:
@@ -26,16 +29,27 @@ def read_file(mouse_file_path: str) -> tuple[list[DataFrame], list[DataFrame]]:
     list_df_mouse_click_data = []
 
     for item in mouse_data_json:
-
         if bool(item):
             df_mouse_movement_data = pd.DataFrame(item['move'])
             df_mouse_click_data = pd.DataFrame(item['click'])
 
             if not df_mouse_movement_data.empty:
-                list_df_mouse_movement_data.append(df_mouse_movement_data)
+                if split_data_every_n_seconds is None:
+                    list_df_mouse_movement_data.append(df_mouse_movement_data)
+                else:
+                    df_mouse_movement_data['interval'] = (df_mouse_movement_data['time'] / split_data_every_n_seconds).astype(int)
+                    grouped_movement_data = df_mouse_movement_data.groupby('interval')
+                    for interval, group_movement in grouped_movement_data:
+                        list_df_mouse_movement_data.append(group_movement)
 
             if not df_mouse_click_data.empty:
-                list_df_mouse_click_data.append(df_mouse_click_data)
+                if split_data_every_n_seconds is None:
+                    list_df_mouse_click_data.append(df_mouse_click_data)
+                else:
+                    df_mouse_click_data['interval'] = (df_mouse_click_data['time'] / split_data_every_n_seconds).astype(int)
+                    grouped_click_data = df_mouse_click_data.groupby('interval')
+                    for interval, group_click in grouped_click_data:
+                        list_df_mouse_click_data.append(group_click)
 
     return list_df_mouse_movement_data, list_df_mouse_click_data
 
