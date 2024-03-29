@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style/switch_user.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style/play_pause.css') }}">
 
-    <div class="container mt-5">
+    <div class="container-fluid mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <form>
@@ -18,21 +18,16 @@
                         <label for="username">Username:</label>
                         <input type="text" class="form-control" id="username" placeholder="Enter username" disabled>
                     </div>
-                    <div class="container mt-5">
-                        <div class="row justify-content-center">
-                            <div class="col-md-6">
-                                <button type="button" id="BtmPlay" class="btn btn-success btn-lg btn-block">Play</button>
-                            </div>
-                        </div>
 
-                        <div class="row justify-content-center mt-3">
-                            <div class="col-md-6">
-                                <button type="button" id="BtmStop" class="btn btn-danger btn-lg btn-block">Stop</button>
-                            </div>
+
+                    <div class="row justify-content-center mt-5">
+                        <div class="col-md-6">
+                            <button type="button" id="playStop" class="btn btn-success btn-lg btn-block">Record</button>
                         </div>
                     </div>
               </form>
-          </div>
+            </div>
+            <div class="col-md-2 position-absolute end-0" id="notificationPanel"></div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='scripts/record/pageIteractions.js') }}" type="module"></script>
