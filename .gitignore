@@ -1,10 +1,11 @@
-/files/
 # Arquivos do sistema operacional
 .DS_Store
 Thumbs.db
 
 # Diretórios de ambiente virtual
 venv/
+
+# Arquivos compilados
 *.pyc
 
 # Arquivos de log
@@ -16,7 +17,7 @@ venv/
 # Arquivos de banco de dados
 *.db
 
-# Diretórios de build e dist
+# Diretórios de build e dist do PyInstaller
 build/
 dist/
 
