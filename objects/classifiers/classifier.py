@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 
 from sklearn.preprocessing import StandardScaler
 
+from common.activity import Activity
 from common.constants import MOUSE_FILE, KEYBOARD_FILE, BASE_DIR
 from objects.analyses.mouse_analyses import MouseAnalyses
 from objects.analyses.keyboard_analyses import KeyboardAnalyses
@@ -50,8 +51,10 @@ class Classifier(ABC):
     def load_mouse_analyses(self,
                             mouse_file_path: str,
                             identifier_label: str,
-                            merge_control: int):
-        list_mouse_movement_data, list_mouse_click_data = read_mouse_file(mouse_file_path=mouse_file_path, split_data_every_n_seconds=15)
+                            merge_control: int,
+                            activity: Activity = None
+                            ):
+        list_mouse_movement_data, list_mouse_click_data = read_mouse_file(mouse_file_path=mouse_file_path, activity=activity, split_data_every_n_seconds=1)
 
         for index in range(len(list_mouse_movement_data)):
             self.mouse_analyses.mouse_movement_data = list_mouse_movement_data[index]
@@ -70,6 +73,7 @@ class Classifier(ABC):
 
             if merge_control is not None:
                 new_df['merge_control'] = merge_control
+
             # VELOCIDADE | MOVIMENTACAO | DISTANCIA | CLICKS | DURACAO DOS CLICKS
             self.df_mouse_stats = self.df_mouse_stats._append(new_df, ignore_index=True)
 
@@ -78,20 +82,23 @@ class Classifier(ABC):
     def load_keyboard_analyses(self,
                                keyboard_file_path: str,
                                identifier_label: str,
-                               merge_control: int):
-        list_keyboard_press_data, list_keyboard_release_data = read_keyboard_file(keyboard_file_path, split_data_every_n_seconds=15)
+                               merge_control: int,
+                               activity: Activity = None
+                               ):
+        list_keyboard_press_data, list_keyboard_release_data = read_keyboard_file(keyboard_file_path, activity=activity, split_data_every_n_seconds=1)
         for index in range(len(list_keyboard_press_data)):
-            self.keyboard_analyses.keyboard_press_data = list_keyboard_press_data[index]
-            self.keyboard_analyses.keyboard_release_data = list_keyboard_release_data[index]
-            self.keyboard_analyses.extract_keyboard_data(make_mean=False)
+            if len(list_keyboard_release_data) > index:
+                self.keyboard_analyses.keyboard_press_data = list_keyboard_press_data[index]
+                self.keyboard_analyses.keyboard_release_data = list_keyboard_release_data[index]
+                self.keyboard_analyses.extract_keyboard_data(make_mean=False)
 
-            new_df = self.keyboard_analyses.generate_dataframe()
-            new_df['expected'] = identifier_label
+                new_df = self.keyboard_analyses.generate_dataframe()
+                new_df['expected'] = identifier_label
 
-            if merge_control is not None:
-                new_df['merge_control'] = merge_control
+                if merge_control is not None:
+                    new_df['merge_control'] = merge_control
 
-            self.df_keyboard_stats = self.df_keyboard_stats._append(new_df, ignore_index=True)
+                self.df_keyboard_stats = self.df_keyboard_stats._append(new_df, ignore_index=True)
 
         return self.df_keyboard_stats
 
@@ -115,16 +122,17 @@ class Classifier(ABC):
                      require_both: bool = True):
 
         if use_mouse_data and use_keyboard_data:
-            assert ('merge_control' in self.df_mouse_stats) and ('merge_control' in self.df_keyboard_stats)
+            assert ('merge_control' in self.df_mouse_stats or self.df_mouse_stats.emptyf) and ('merge_control' in self.df_keyboard_stats or self.df_keyboard_stats.empty)
+
 
         combined_data = pd.DataFrame()
-        if use_mouse_data:
+        if use_mouse_data and not self.df_mouse_stats.empty:
             combined_data = self.df_mouse_stats.copy()
         elif not require_both:
             combined_data = pd.DataFrame(
                 columns=self.df_keyboard_stats.columns)  # Cria um DataFrame vazio com as colunas do df_keyboard_stats
 
-        if use_keyboard_data:
+        if use_keyboard_data and not self.df_keyboard_stats.empty:
             if combined_data.empty:
                 combined_data = self.df_keyboard_stats.copy()
             else:
@@ -179,17 +187,20 @@ class Classifier(ABC):
 
         labels_executed = []
         merge_control = 0
-        for root, subdirectory, files in os.walk(base_directory):
+
+        for subdirectory in os.listdir(base_directory):
             merge_control += 1
-            for folder in subdirectory:
-                merge_control += 1
-                self.load_mouse_analyses(mouse_file_path=os.path.join(root, folder, MOUSE_FILE),
-                                         identifier_label=folder,
-                                         merge_control=merge_control)
-                self.load_keyboard_analyses(keyboard_file_path=os.path.join(root, folder, KEYBOARD_FILE),
-                                            identifier_label=folder,
-                                            merge_control=merge_control)
-                labels_executed.append(labels_executed)
+            self.load_mouse_analyses(mouse_file_path=os.path.join(base_directory, subdirectory),
+                                     identifier_label=subdirectory,
+                                     merge_control=merge_control,
+                                     activity=None
+                                     )
+            self.load_keyboard_analyses(keyboard_file_path=os.path.join(base_directory, subdirectory),
+                                        identifier_label=subdirectory,
+                                        merge_control=merge_control,
+                                        activity=None
+                                        )
+            labels_executed.append(labels_executed)
 
         raw_x_train, raw_x_test, y_train, y_test = self.prepare_data(validation_column_label='expected',
                                                                      filter_one_member_only=True)
