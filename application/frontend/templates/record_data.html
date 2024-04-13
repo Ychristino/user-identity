@@ -16,9 +16,15 @@
 
                     <div class="form-group">
                         <label for="username">Username:</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter username" disabled>
-                    </div>
+                        <input type="text" class="form-control mb-3" id="username" placeholder="Enter username" disabled>
 
+                        <label for="activitySelect">Activity:</label>
+                        <select class="form-control" id="activitySelect">
+                            {% for label, value in activities_list %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                     <div class="row justify-content-center mt-5">
                         <div class="col-md-6">

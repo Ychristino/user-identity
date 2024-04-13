@@ -6,6 +6,7 @@ from application.backend.controllers.mouse_view_controller import MouseViewContr
 from application.backend.controllers.record_controller import RecordController
 from application.backend.controllers.statistics_controller import StatisticsController
 from application.backend.controllers.user_controller import UserController
+from application.backend.controllers.activity_controller import ActivityController
 
 app = Flask(__name__)
 CORS(app)
@@ -13,6 +14,7 @@ CORS(app)
 app.add_url_rule('/check_user', view_func=UserController.check_user, methods=['GET'])
 app.add_url_rule('/check_user/<username>', view_func=UserController.check_user, methods=['GET'])
 app.add_url_rule('/users_list', view_func=UserController.user_list, methods=['GET'])
+app.add_url_rule('/activities', view_func=ActivityController.activity_list, methods=['GET'])
 
 app.add_url_rule('/view/mouse_position/<username>', view_func=MouseViewController.mouse_position, methods=['GET'])
 app.add_url_rule('/view/mouse_click/<username>', view_func=MouseViewController.mouse_click, methods=['GET'])

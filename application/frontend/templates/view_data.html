@@ -20,7 +20,9 @@
           <div class="form-group mt-3" id="userArea">
             <label for="user">Select User</label>
             <select class="form-control" id="user">
-              <!-- Options will be dynamically added here -->
+              {% for value in user_list %}
+              <option value="{{ value }}">{{ value }}</option>
+              {% endfor %}
             </select>
           </div>
           <button type="button" id="generateGraph" class="btn btn-primary mt-3">Generate</button>

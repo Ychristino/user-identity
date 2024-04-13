@@ -5,12 +5,15 @@ const API = new ApiRequest(BASE_URL);
 
 const START_RECORD = async () => {
     const USERNAME = document.getElementById("username").value;
+    const ACTIVITY = document.getElementById('activitySelect').value;
     const IS_MAIN_USER = document.getElementById("isMainUser").checked
 
     const BODY_DATA = {
-                            main_user: IS_MAIN_USER,
-                            user_running: USERNAME
-                        }
+                        main_user: IS_MAIN_USER,
+                        user_running: USERNAME,
+                        activity: ACTIVITY
+                      };
+
     const response = await API.post(API_START_RECORD, BODY_DATA);
     return response.data;
 };

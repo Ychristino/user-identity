@@ -1,24 +1,8 @@
-import { USER_LIST, MOUSE_MOVE, FULL_DATA } from './apiView.js';
+import { MOUSE_MOVE, FULL_DATA } from './apiView.js';
 import { plotScatterPlot } from './generateScatterplot.js';
 import { plot2DDensityPlot } from './generate2DDensity.js';
 import { plotGroupBar } from './generateGroupBar.js';
 import { show_notification } from '../common/alert.js';
-
-document.addEventListener("DOMContentLoaded", function () {
-    USER_LIST()
-    .then(lista => {
-        const usersSelect = document.getElementById('user');
-        lista.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.username;
-            option.textContent = user.username;
-            usersSelect.appendChild(option);
-        });
-    })
-    .catch(error => {
-        show_notification(`Erro ao obter lista de usuários. ${error}`, 'danger');
-    });
-});
 
 document.getElementById('graphType').addEventListener('change', (event)=>{
     const SELECT_USER = document.getElementById('user');

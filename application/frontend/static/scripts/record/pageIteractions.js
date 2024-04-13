@@ -10,7 +10,7 @@ document.getElementById('isMainUser').addEventListener('click', (event)=>{
     USERNAME.disabled = event.target.checked;
     USERNAME.value = '';
 
-})
+});
 
 document.getElementById("playStop").addEventListener("click", (event)=> {
 
@@ -27,7 +27,7 @@ document.getElementById("playStop").addEventListener("click", (event)=> {
         make_button_load(toggleButton)
         if (isPlaying) {
             if (confirm('The mouse coordinates (X, Y) position will be recorded. Also, we will keep track of your Keyboard to record the times of key presses and release. The data will be used strictly for metrics. For precaution, at this time, avoid using this app while you are authenticating in another app.')){
-                START_RECORD(event)
+                START_RECORD()
                     .then(() => {
                         toggleButton.classList.add("toggle-button");
                         toggleButton.classList.remove("btn-success");

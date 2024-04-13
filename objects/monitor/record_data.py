@@ -5,6 +5,7 @@ import json
 import inspect
 from typing import Tuple, List, Any
 
+from common.activity import Activity
 from common.constants import MOUSE_FILE, KEYBOARD_FILE, BASE_DIR
 from objects.monitor.keyboard_monitor import KeyboardMonitor
 from objects.monitor.mouse_monitor import MouseMonitor
@@ -17,8 +18,9 @@ class RecordData:
     agrupadas em classes independentes de monitoramente, como mouse_monitor ou keyboard_monitor
     """
 
-    def __init__(self, username: str):
+    def __init__(self, username: str, activity: Activity):
         self.username = username
+        self.activity = activity
         self.mouse_monitor = MouseMonitor()
         self.keyboard_monitor = KeyboardMonitor()
         self.mouse_data = []
@@ -77,8 +79,7 @@ class RecordData:
         :return:
         """
         caller_method = inspect.stack()[1][3]
-
-        data_path = os.path.join(BASE_DIR, 'files', self.username)
+        data_path = os.path.join(BASE_DIR, 'files', self.username, self.activity.value['folder'])
 
         if not os.path.exists(data_path):
             os.makedirs(data_path)

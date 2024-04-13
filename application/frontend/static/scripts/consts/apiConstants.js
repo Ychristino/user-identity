@@ -3,6 +3,8 @@ const BASE_URL = "http://127.0.0.1:5000";
 const API_START_RECORD = "start_recording";
 const API_STOP_RECORD = "stop_recording";
 
+const API_ACTIVITY_LIST = "activities";
+
 const API_CHECK_USER = "check_user/{username}";
 const API_USER_LIST = "users_list";
 

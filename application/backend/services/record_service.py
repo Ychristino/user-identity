@@ -1,5 +1,6 @@
 import threading
 
+from common.activity import Activity
 from objects.monitor.record_data import RecordData
 
 
@@ -9,9 +10,9 @@ class RecordService:
         self.record_data = None
         self.recording_thread = None
 
-    def start_record(self, user_running: str):
+    def start_record(self, user_running: str, activity: Activity):
         if not self.recording:
-            self.record_data = RecordData(user_running)
+            self.record_data = RecordData(user_running, activity)
             self.recording_thread = threading.Thread(target=self.record_data.record_all)
             self.recording_thread.start()
             self.recording = True
