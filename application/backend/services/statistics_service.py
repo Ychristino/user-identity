@@ -13,16 +13,16 @@ def _generate_mouse_stats(user_mouse_file_path: str, activity: Activity = None):
     analyses = MouseAnalyses()
     list_mouse_movement_data, list_mouse_click_data = read_mouse_file(mouse_file_path=user_mouse_file_path, activity=activity)
 
-    for move_data in list_mouse_movement_data:
-        analyses.mouse_movement_data = move_data
-
+    for index in range(len(list_mouse_movement_data)):
+        analyses.mouse_movement_data = list_mouse_movement_data[index]
         analyses.extract_velocity_metrics()
         analyses.extract_movement_metrics()
         analyses.extract_distance_metrics()
+        if index < len(list_mouse_click_data):
+            analyses.mouse_click_data = list_mouse_click_data[index]
+            analyses.extract_clicks_metrics()
+        analyses.extract_general_metrics()
 
-    for click_data in list_mouse_click_data:
-        analyses.mouse_click_data = click_data
-        analyses.extract_clicks_metrics()
     return analyses.generate_dataframe().to_json()
 
 

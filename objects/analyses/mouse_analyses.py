@@ -358,22 +358,6 @@ class MouseAnalyses:
 
         df_clicks = df_clicks.sort_values(by='time')
 
-        # Calcular o número total de cliques
-        total_clicks = df_clicks[df_clicks['status'] == ClickStatus.PRESS.value].shape[0]
-        self.total_clicks = np.nanmean([self.total_clicks, total_clicks]) if (
-                self.total_clicks is not None and make_mean) else total_clicks if not np.isnan(total_clicks) else 0
-
-        # Calcular o número de cliques direitos e esquerdos
-        right_clicks = df_clicks[
-            (df_clicks['button'] == str(Button.right)) & (df_clicks['status'] == ClickStatus.PRESS.value)].shape[0]
-        self.right_clicks = np.nanmean([self.right_clicks, right_clicks]) if (
-                self.right_clicks is not None and make_mean) else right_clicks if not np.isnan(right_clicks) else 0
-
-        left_clicks = df_clicks[
-            (df_clicks['button'] == str(Button.left)) & (df_clicks['status'] == ClickStatus.PRESS.value)].shape[0]
-        self.left_clicks = np.nanmean([self.left_clicks, left_clicks]) if (
-                self.left_clicks is not None and make_mean) else left_clicks if not np.isnan(left_clicks) else 0
-
         click_pairs = pd.DataFrame(columns=['button', 'press_time', 'release_time'])
 
         # Encontra os pares 'press' e 'release' para o mesmo botão
@@ -402,6 +386,21 @@ class MouseAnalyses:
 
         # Calcula a duração de cada par de cliques
         click_pairs['duration'] = click_pairs['release_time'] - click_pairs['press_time']
+
+        # Calcular o número total de cliques
+        total_clicks = df_clicks.size
+        self.total_clicks = np.nanmean([self.total_clicks, total_clicks]) if (
+                self.total_clicks is not None and make_mean) else total_clicks if not np.isnan(total_clicks) else 0
+
+        button_counts = click_pairs['button'].value_counts()
+        # Calcular o número de cliques direitos e esquerdos
+        right_clicks = button_counts.get(str(Button.right),0)
+        self.right_clicks = np.nanmean([self.right_clicks, right_clicks]) if (
+                self.right_clicks is not None and make_mean) else right_clicks if not np.isnan(right_clicks) else 0
+
+        left_clicks = button_counts.get(str(Button.left),0)
+        self.left_clicks = np.nanmean([self.left_clicks, left_clicks]) if (
+                self.left_clicks is not None and make_mean) else left_clicks if not np.isnan(left_clicks) else 0
 
         right_click_total_duration = click_pairs[click_pairs['button'] == str(Button.right)]['duration'].sum()
         self.right_click_total_duration = np.nanmean([self.right_click_total_duration, right_click_total_duration]) if (
@@ -471,8 +470,8 @@ class MouseAnalyses:
 
         df_non_movement = df_movement[df_movement['time_interval'] > move_interval_tolerance]
         df_non_clicks = df_clicks[df_clicks['time_interval'] > click_interval_tolerance]
-
         total_non_movement_time = df_non_movement['time_interval'].sum()
+
         self.non_movement_time = np.nanmean(
             [self.non_movement_time, total_non_movement_time]) if (
                 self.non_movement_time is not None and make_mean) else total_non_movement_time if not np.isnan(
@@ -535,15 +534,15 @@ if __name__ == '__main__':
     analyses = MouseAnalyses()
     list_mouse_movement_data, list_mouse_click_data = read_file(os.path.join('../../', 'files', 'user'))
 
-#    for move_data in list_mouse_movement_data:
-#        analyses.mouse_movement_data = move_data
-#
-#        analyses.extract_velocity_metrics()
-#        analyses.extract_movement_metrics()
-#        analyses.extract_distance_metrics()
-#
-#    for click_data in list_mouse_click_data:
-#        analyses.mouse_click_data = click_data
-#        analyses.extract_clicks_metrics()
+    for move_data in list_mouse_movement_data:
+        analyses.mouse_movement_data = move_data
+        analyses.extract_velocity_metrics()
+        analyses.extract_movement_metrics()
+        analyses.extract_distance_metrics()
 
-#    print(analyses.generate_dataframe())
+    for click_data in list_mouse_click_data:
+        analyses.mouse_click_data = click_data
+        analyses.extract_clicks_metrics()
+        analyses.extract_general_metrics()
+
+    print(analyses.generate_dataframe())
