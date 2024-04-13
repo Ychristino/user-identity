@@ -35,9 +35,6 @@ def record():
 
 @app.route('/view')
 def view():
-    # Supondo que você tenha algum dado a ser passado para o template record_data.html
-    # data = {"example_data": "Some data to display"}
-    # return render_template('record_data.html', data=data)
     return render_template('view_data.html', user_list=get_user_list_from_api())
 
 
