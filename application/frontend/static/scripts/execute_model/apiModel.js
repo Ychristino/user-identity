@@ -13,7 +13,7 @@ const EXECUTE_MODEL = async () => {
                         activity: !ALL_ACTIVITIES ? ACTIVITY : null,
                       };
 
-        const response = await API.get(API.post(API_MODELS, BODY_DATA));
+        const response = await API.post(API_MODELS, BODY_DATA);
         return response.data;
 };
 
