@@ -22,4 +22,4 @@ class KneiborsClassifier(Classifier):
 
 if __name__ == '__main__':
     classifier = KneiborsClassifier()
-    classifier.execute(base_directory='..\\..\\files')
+    print(classifier.execute(base_directory='..\\..\\files'))

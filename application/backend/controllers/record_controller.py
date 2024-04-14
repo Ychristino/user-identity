@@ -17,7 +17,7 @@ class RecordController:
         else:
             user_running = data.get('user_running')
         if not isinstance(selected_activity, Activity):
-            return jsonify({"error": "Activity information was found."}), 400
+            return jsonify({"error": "Activity information was not found."}), 400
 
         if user_running:
             if record_service.start_record(user_running, selected_activity):

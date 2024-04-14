@@ -1,7 +1,6 @@
 import pandas as pd
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import classification_report, precision_recall_fscore_support
 
 from objects.analyses.mouse_analyses import MouseAnalyses
 from objects.analyses.keyboard_analyses import KeyboardAnalyses

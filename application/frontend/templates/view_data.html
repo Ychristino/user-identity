@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Record Data{% endblock %}
 {% block content %}
+  <style>
+    #graphPlot {
+      height: calc(100vh - 200px); /* Ajusta a altura para ocupar todo o espaço vertical disponível, excluindo a altura dos outros elementos */
+    }
+  </style>
+
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
   <div class="col-md-2 position-absolute end-0" id="notificationPanel"></div>
@@ -29,15 +35,24 @@
         </form>
       </div>
     </div>
-  </div>
-
-  <div class="text-center mt-5" id="loading" style="display: none">
-    <div class="spinner-grow text-success" style="width: 3rem; height: 3rem;" role="status">
-      <span class="visually-hidden">Loading...</span>
+    <div class="row mt-5">
+      <div class="col-md-12">
+        <div class="text-center" id="loading" style="display: none">
+          <div class="spinner-grow text-success" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="graphPlot" class="text-center mt-5"></div>
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-12">
+        <div id="graphPlot" class="text-center"></div>
+      </div>
+    </div>
+  </div>
 
   <script src="{{ url_for('static', filename='scripts/view/pageIteractions.js') }}" type="module"></script>
 {% endblock %}

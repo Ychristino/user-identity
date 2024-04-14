@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
+from common.activity import Activity
 from common.constants import MOUSE_FILE, KEYBOARD_FILE, BASE_DIR
 from objects.analyses.keyboard_analyses import KeyboardAnalyses
 from objects.analyses.mouse_analyses import MouseAnalyses
@@ -24,21 +25,26 @@ class TreeClassifier(Classifier):
     def create_classifier(self):
         self.classifier = DecisionTreeClassifier()
 
-    def execute(self, base_directory: str = os.path.join(BASE_DIR, 'files')):
-
+    def execute(self,
+                base_directory: str = os.path.join(BASE_DIR, 'files'),
+                activity: Activity = None
+                ):
         labels_executed = []
         merge_control = 0
-        for root, subdirectory, files in os.walk(base_directory):
+
+        for subdirectory in os.listdir(base_directory):
             merge_control += 1
-            for folder in subdirectory:
-                merge_control += 1
-                labels_executed.append(folder)
-                self.load_mouse_analyses(mouse_file_path=os.path.join(root, folder, MOUSE_FILE),
-                                         identifier_label=folder,
-                                         merge_control=merge_control)
-                self.load_keyboard_analyses(keyboard_file_path=os.path.join(root, folder, KEYBOARD_FILE),
-                                            identifier_label=folder,
-                                            merge_control=merge_control)
+            self.load_mouse_analyses(mouse_file_path=os.path.join(base_directory, subdirectory),
+                                     identifier_label=subdirectory,
+                                     merge_control=merge_control,
+                                     activity=activity
+                                     )
+            self.load_keyboard_analyses(keyboard_file_path=os.path.join(base_directory, subdirectory),
+                                        identifier_label=subdirectory,
+                                        merge_control=merge_control,
+                                        activity=activity
+                                        )
+            labels_executed.append(subdirectory)
 
         raw_x_train, raw_x_test, y_train, y_test = self.prepare_data(validation_column_label='expected',
                                                                      filter_one_member_only=True)
@@ -50,16 +56,23 @@ class TreeClassifier(Classifier):
         self.execute_train(data_to_train=x_train, expected_value=y_train)
         predictions = self.run_prediction(data_to_predict=x_test)
 
-        precision, recall, fscore, support = metrics(train_data=x_train,
-                                                     test_data=x_test,
-                                                     expected_train_predictions=y_train,
-                                                     expected_test_predictions=y_test,
-                                                     current_predictions=predictions)
+        train_data_size, test_data_size, train_data, test_data, metrics_by_class = metrics(train_data=x_train,
+                                                                                           test_data=x_test,
+                                                                                           expected_train_predictions=y_train,
+                                                                                           expected_test_predictions=y_test,
+                                                                                           current_predictions=predictions,
+                                                                                           label_executed=tuple(
+                                                                                               labels_executed)
+                                                                                           )
 
         plt.figure(figsize=(10, 10))  # Ajuste o tamanho da figura conforme necessário
-        plot_tree(self.classifier, filled=True, feature_names=raw_x_train.columns,
+        plot_tree(self.classifier,
+                  filled=True,
+                  feature_names=raw_x_train.columns,
                   class_names=labels_executed)
         plt.show()
+
+        return train_data_size, test_data_size, train_data, test_data, metrics_by_class
 
 
 if __name__ == '__main__':

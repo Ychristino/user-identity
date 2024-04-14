@@ -15,6 +15,7 @@ const API_MOUSE_FULL = "view/mouse_full/{username}"
 const API_KEYBOARD_STATS = "/stats/keyboard/{username}"
 const API_MOUSE_STATS = "/stats/mouse/{username}"
 const API_FULL_STATS ="/stats/full/{username}"
+const API_MODELS = "/models"
 
 export { BASE_URL, API_START_RECORD, API_STOP_RECORD, API_CHECK_USER, API_USER_LIST, API_MOUSE_MOVE, API_MOUSE_CLICK,
-         API_MOUSE_FULL, API_KEYBOARD_STATS, API_MOUSE_STATS, API_FULL_STATS };
+         API_MOUSE_FULL, API_KEYBOARD_STATS, API_MOUSE_STATS, API_FULL_STATS, API_MODELS };

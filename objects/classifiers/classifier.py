@@ -18,18 +18,30 @@ from objects.analyses.keyboard_analyses import read_file as read_keyboard_file
 from objects.analyses.mouse_analyses import read_file as read_mouse_file
 
 
-def metrics(train_data: pd.DataFrame, test_data: pd.DataFrame, expected_train_predictions: pd.Series,
-            expected_test_predictions: pd.Series, current_predictions: pd.Series):
-    print(classification_report(expected_test_predictions, current_predictions, zero_division=0))
-    print(f"Número de dados de treinamento: {len(train_data)}")
-    print(f"Número de dados de teste: {len(test_data)}")
+def metrics(train_data: pd.DataFrame,
+            test_data: pd.DataFrame,
+            expected_train_predictions: pd.Series,
+            expected_test_predictions: pd.Series,
+            current_predictions: pd.Series,
+            label_executed: tuple
+            ):
 
-    print('Dados de treino:')
-    print(expected_train_predictions.value_counts())
-    print('Dados de Execução:')
-    print(expected_test_predictions.value_counts())
+    train_data_size = len(train_data)
+    test_data_size = len(test_data)
+    train_data = expected_train_predictions.value_counts()
+    test_data = expected_test_predictions.value_counts()
+    precision, recall, fscore, support = precision_recall_fscore_support(expected_test_predictions, current_predictions, zero_division=0)
 
-    return precision_recall_fscore_support(expected_test_predictions, current_predictions, zero_division=0)
+    metrics_by_class = {}
+    for i, class_label in enumerate(label_executed):
+        metrics_by_class[class_label] = {
+            'precision': float(precision[i]),
+            'recall': float(recall[i]),
+            'fscore': float(fscore[i]),
+            'support': int(support[i])
+        }
+
+    return train_data_size, test_data_size, train_data, test_data, metrics_by_class
 
 
 class Classifier(ABC):
@@ -183,7 +195,10 @@ class Classifier(ABC):
     def run_prediction(self, data_to_predict):
         return self.classifier.predict(data_to_predict)
 
-    def execute(self, base_directory: str = os.path.join(BASE_DIR, 'files')):
+    def execute(self,
+                base_directory: str = os.path.join(BASE_DIR, 'files'),
+                activity: Activity = None
+                ):
 
         labels_executed = []
         merge_control = 0
@@ -193,14 +208,14 @@ class Classifier(ABC):
             self.load_mouse_analyses(mouse_file_path=os.path.join(base_directory, subdirectory),
                                      identifier_label=subdirectory,
                                      merge_control=merge_control,
-                                     activity=None
+                                     activity=activity
                                      )
             self.load_keyboard_analyses(keyboard_file_path=os.path.join(base_directory, subdirectory),
                                         identifier_label=subdirectory,
                                         merge_control=merge_control,
-                                        activity=None
+                                        activity=activity
                                         )
-            labels_executed.append(labels_executed)
+            labels_executed.append(subdirectory)
 
         raw_x_train, raw_x_test, y_train, y_test = self.prepare_data(validation_column_label='expected',
                                                                      filter_one_member_only=True)
@@ -212,11 +227,15 @@ class Classifier(ABC):
         self.execute_train(data_to_train=x_train, expected_value=y_train)
         predictions = self.run_prediction(data_to_predict=x_test)
 
-        precision, recall, fscore, support = metrics(train_data=x_train,
-                                                     test_data=x_test,
-                                                     expected_train_predictions=y_train,
-                                                     expected_test_predictions=y_test,
-                                                     current_predictions=predictions)
+        train_data_size, test_data_size, train_data, test_data, metrics_by_class = metrics(train_data=x_train,
+                                                                                           test_data=x_test,
+                                                                                           expected_train_predictions=y_train,
+                                                                                           expected_test_predictions=y_test,
+                                                                                           current_predictions=predictions,
+                                                                                           label_executed=tuple(labels_executed)
+                                                                                           )
+
+        return train_data_size, test_data_size, train_data, test_data, metrics_by_class
 
 
 if __name__ == '__main__':
