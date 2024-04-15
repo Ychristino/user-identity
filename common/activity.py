@@ -22,6 +22,12 @@ class Activity(Enum):
                    'folder': 'web_browser',
                    'id': 4
                    }
+    COUNTER_STRIKE = {'label': 'CS 2',
+                      'value': 'cs',
+                      'folder': 'counter_strike',
+                      'id': 5
+                      }
+
 
 # Função para encontrar a atividade pelo valor
 def find_activity_by_value(value):

@@ -34,31 +34,32 @@ def read_file(mouse_file_path: str,
         activity_list = [conteudo for conteudo in os.listdir(mouse_file_path) if os.path.isdir(os.path.join(mouse_file_path, conteudo))]
 
     for folder in activity_list:
-        with open(os.path.join(mouse_file_path, folder, MOUSE_FILE), 'r') as f:
-            mouse_data_json = json.load(f)
+        if os.path.exists(os.path.join(mouse_file_path, folder, MOUSE_FILE)):
+            with open(os.path.join(mouse_file_path, folder, MOUSE_FILE), 'r') as f:
+                mouse_data_json = json.load(f)
 
-        for item in mouse_data_json:
-            if bool(item):
-                df_mouse_movement_data = pd.DataFrame(item['move'])
-                df_mouse_click_data = pd.DataFrame(item['click'])
+            for item in mouse_data_json:
+                if bool(item):
+                    df_mouse_movement_data = pd.DataFrame(item['move'])
+                    df_mouse_click_data = pd.DataFrame(item['click'])
 
-                if not df_mouse_movement_data.empty:
-                    if split_data_every_n_seconds is None:
-                        list_df_mouse_movement_data.append(df_mouse_movement_data)
-                    else:
-                        df_mouse_movement_data['interval'] = (df_mouse_movement_data['time'] / split_data_every_n_seconds).astype(int)
-                        grouped_movement_data = df_mouse_movement_data.groupby('interval')
-                        for interval, group_movement in grouped_movement_data:
-                            list_df_mouse_movement_data.append(group_movement)
+                    if not df_mouse_movement_data.empty:
+                        if split_data_every_n_seconds is None:
+                            list_df_mouse_movement_data.append(df_mouse_movement_data)
+                        else:
+                            df_mouse_movement_data['interval'] = (df_mouse_movement_data['time'] / split_data_every_n_seconds).astype(int)
+                            grouped_movement_data = df_mouse_movement_data.groupby('interval')
+                            for interval, group_movement in grouped_movement_data:
+                                list_df_mouse_movement_data.append(group_movement)
 
-                if not df_mouse_click_data.empty:
-                    if split_data_every_n_seconds is None:
-                        list_df_mouse_click_data.append(df_mouse_click_data)
-                    else:
-                        df_mouse_click_data['interval'] = (df_mouse_click_data['time'] / split_data_every_n_seconds).astype(int)
-                        grouped_click_data = df_mouse_click_data.groupby('interval')
-                        for interval, group_click in grouped_click_data:
-                            list_df_mouse_click_data.append(group_click)
+                    if not df_mouse_click_data.empty:
+                        if split_data_every_n_seconds is None:
+                            list_df_mouse_click_data.append(df_mouse_click_data)
+                        else:
+                            df_mouse_click_data['interval'] = (df_mouse_click_data['time'] / split_data_every_n_seconds).astype(int)
+                            grouped_click_data = df_mouse_click_data.groupby('interval')
+                            for interval, group_click in grouped_click_data:
+                                list_df_mouse_click_data.append(group_click)
 
     return list_df_mouse_movement_data, list_df_mouse_click_data
 

@@ -44,7 +44,8 @@ class TreeClassifier(Classifier):
                                         merge_control=merge_control,
                                         activity=activity
                                         )
-            labels_executed.append(subdirectory)
+            if subdirectory in self.df_mouse_stats['expected'].values and subdirectory in self.df_keyboard_stats['expected'].values:
+                labels_executed.append(subdirectory)
 
         raw_x_train, raw_x_test, y_train, y_test = self.prepare_data(validation_column_label='expected',
                                                                      filter_one_member_only=True)

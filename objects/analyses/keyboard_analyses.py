@@ -31,38 +31,39 @@ def read_file(keyboard_file_path: str,
         activity_list = [conteudo for conteudo in os.listdir(keyboard_file_path) if os.path.isdir(os.path.join(keyboard_file_path, conteudo))]
 
     for folder in activity_list:
-        with open(os.path.join(keyboard_file_path, folder, KEYBOARD_FILE), 'r') as f:
-            keyboard_data_json = json.load(f)
+        if os.path.exists(os.path.join(keyboard_file_path, folder, KEYBOARD_FILE)):
+            with open(os.path.join(keyboard_file_path, folder, KEYBOARD_FILE), 'r') as f:
+                keyboard_data_json = json.load(f)
 
-            for item in keyboard_data_json:
-                if bool(item):
-                    df_keyboard_press_data = pd.DataFrame(item['press'])
-                    df_keyboard_release_data = pd.DataFrame(item['release'])
+                for item in keyboard_data_json:
+                    if bool(item):
+                        df_keyboard_press_data = pd.DataFrame(item['press'])
+                        df_keyboard_release_data = pd.DataFrame(item['release'])
 
-                    if df_keyboard_press_data.empty or df_keyboard_release_data.empty:
-                        continue
+                        if df_keyboard_press_data.empty or df_keyboard_release_data.empty:
+                            continue
 
-                    if split_data_every_n_seconds is None:
-                        list_df_keyboard_press_data.append(df_keyboard_press_data)
-                        list_df_keyboard_release_data.append(df_keyboard_release_data)
-                    else:
-                        # Adiciona uma nova coluna para marcar o intervalo de tempo
-                        df_keyboard_press_data['interval'] = (df_keyboard_press_data['time'] / split_data_every_n_seconds).astype(int)
-                        df_keyboard_release_data['interval'] = (df_keyboard_release_data['time'] / split_data_every_n_seconds).astype(int)
+                        if split_data_every_n_seconds is None:
+                            list_df_keyboard_press_data.append(df_keyboard_press_data)
+                            list_df_keyboard_release_data.append(df_keyboard_release_data)
+                        else:
+                            # Adiciona uma nova coluna para marcar o intervalo de tempo
+                            df_keyboard_press_data['interval'] = (df_keyboard_press_data['time'] / split_data_every_n_seconds).astype(int)
+                            df_keyboard_release_data['interval'] = (df_keyboard_release_data['time'] / split_data_every_n_seconds).astype(int)
 
-                        # Calcula o tempo ajustado
-                        df_keyboard_press_data['time'] = df_keyboard_press_data['time'] - (df_keyboard_press_data['interval'] * split_data_every_n_seconds)
-                        df_keyboard_release_data['time'] = df_keyboard_release_data['time'] - (df_keyboard_release_data['interval'] * split_data_every_n_seconds)
+                            # Calcula o tempo ajustado
+                            df_keyboard_press_data['time'] = df_keyboard_press_data['time'] - (df_keyboard_press_data['interval'] * split_data_every_n_seconds)
+                            df_keyboard_release_data['time'] = df_keyboard_release_data['time'] - (df_keyboard_release_data['interval'] * split_data_every_n_seconds)
 
-                        # Agrupa os dados por intervalo
-                        grouped_press_data = df_keyboard_press_data.groupby('interval')
-                        grouped_release_data = df_keyboard_release_data.groupby('interval')
+                            # Agrupa os dados por intervalo
+                            grouped_press_data = df_keyboard_press_data.groupby('interval')
+                            grouped_release_data = df_keyboard_release_data.groupby('interval')
 
-                        # Divide os dados em DataFrames separados por intervalo
-                        for interval, group_press in grouped_press_data:
-                            list_df_keyboard_press_data.append(group_press)
-                            if interval in grouped_release_data.groups:
-                                list_df_keyboard_release_data.append(grouped_release_data.get_group(interval))
+                            # Divide os dados em DataFrames separados por intervalo
+                            for interval, group_press in grouped_press_data:
+                                list_df_keyboard_press_data.append(group_press)
+                                if interval in grouped_release_data.groups:
+                                    list_df_keyboard_release_data.append(grouped_release_data.get_group(interval))
 
     return list_df_keyboard_press_data, list_df_keyboard_release_data
 
