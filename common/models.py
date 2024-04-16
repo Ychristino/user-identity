@@ -30,6 +30,10 @@ class Models(Enum):
                                  'value': 'svc',
                                  'id': 7
                                  }
+    DUMMY_CLASSIFIER = {'label': 'Dummy (Metrics Only)',
+                        'value': 'dum',
+                        'id': 8
+                        }
 
 
 def find_model_by_value(value):

@@ -70,7 +70,8 @@ class TreeClassifier(Classifier):
         plot_tree(self.classifier,
                   filled=True,
                   feature_names=raw_x_train.columns,
-                  class_names=labels_executed)
+                  class_names=labels_executed,
+                  max_depth=5)
         plt.show()
 
         return train_data_size, test_data_size, train_data, test_data, metrics_by_class

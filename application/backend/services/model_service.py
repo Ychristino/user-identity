@@ -6,6 +6,7 @@ from common.constants import BASE_DIR
 from common.models import Models
 from objects.classifiers.adaboost_classifier import AdaBoostClassifier
 from objects.classifiers.decision_tree_classifier import TreeClassifier
+from objects.classifiers.dummy_classifier import DummyClassifier
 from objects.classifiers.forest_classifier import ForesClassifier
 from objects.classifiers.gradientboost_classifier import GradientClassifier
 from objects.classifiers.kneighbors_classifier import KneiborsClassifier
@@ -39,6 +40,8 @@ class ModelService:
                 selected_model = LogisticRegressionClassifier()
             case Models.SUPPORT_VECTOR_CLASSIFIER:
                 selected_model = SVCClassifier()
+            case Models.DUMMY_CLASSIFIER:
+                selected_model = DummyClassifier()
             case _:
                 raise Exception('Not a valid Model')
 
