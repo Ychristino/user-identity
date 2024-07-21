@@ -533,17 +533,23 @@ class MouseAnalyses:
 
 if __name__ == '__main__':
     analyses = MouseAnalyses()
-    list_mouse_movement_data, list_mouse_click_data = read_file(os.path.join('../../', 'files', 'user'))
-
+    list_mouse_movement_data, list_mouse_click_data = read_file(os.path.join('../../', 'files', 'user'), split_data_every_n_seconds=15)
+    i = 0
     for move_data in list_mouse_movement_data:
         analyses.mouse_movement_data = move_data
-        analyses.extract_velocity_metrics()
-        analyses.extract_movement_metrics()
-        analyses.extract_distance_metrics()
+        analyses.extract_velocity_metrics(make_mean=False)
+        analyses.extract_movement_metrics(make_mean=False)
+        analyses.extract_distance_metrics(make_mean=False)
+        i += 1
+        if i == 121:
+            break
 
+    i = 0
     for click_data in list_mouse_click_data:
         analyses.mouse_click_data = click_data
-        analyses.extract_clicks_metrics()
-        analyses.extract_general_metrics()
-
+        analyses.extract_clicks_metrics(make_mean=False)
+        analyses.extract_general_metrics(make_mean=False)
+        i += 1
+        if i == 121:
+            break
     print(analyses.generate_dataframe())
