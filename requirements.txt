@@ -32,4 +32,3 @@ threadpoolctl==3.5.0
 tzdata==2024.1
 urllib3==2.2.2
 Werkzeug==3.0.3
-annotated_types==0.6.0
